@@ -7,12 +7,13 @@ class GameMaster:
         # Init the list of games managed by this game master
         self.games = []
 
-    def create_game(self, game_id, start_time):
+    def create_game(self, game_id, start_time, correct_rune):
         # Create the game
-        game = Game(game_id, start_time)
+        game = Game(game_id, start_time, correct_rune)
 
         # Register it
         self.games.append(game)
+        print(self.games, 'after creating the game')
         return game
 
     def get_game(self, game_id):
@@ -23,7 +24,6 @@ class GameMaster:
             if running_game.game_id == game_id:
                 game = running_game
                 break
-
         return game
 
 
@@ -37,9 +37,17 @@ class PlayerMaster:
         # Create the player
         player = Player(player_username, player_role)
 
-        # Register it
-        self.players.append(player)
-        return player
+        start_game = False
+        
+        if player_role in self.roles:
+            return f"{player_role} is already taken! Pick another one"
+        else:
+            self.roles.append(player_role)
+            self.players.append(player)
+            if len(self.roles) == 2: 
+                start_game = True
+            return start_game
+
 
     def get_player(self, player_username):
         # Return the player matching the given player_username
@@ -52,13 +60,4 @@ class PlayerMaster:
 
         return player
     
-    def create_get_role(self, player_role):
-        # # Create the role
-        ready = False
-        if player_role in self.roles:
-            return f"{player_role} is already taken! Pick another one"
-        else:
-            self.roles.append(player_role)
-            if len(self.roles) == 2: 
-                ready = True
-            return ready
+

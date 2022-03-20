@@ -1,12 +1,17 @@
 asgiref==3.5.0
 bidict==0.21.4
+certifi==2021.10.8
+charset-normalizer==2.0.12
 click==7.1.2
 dnspython==1.16.0
 eventlet==0.30.2
 greenlet==1.1.2
 gunicorn==20.1.0
 h11==0.13.0
+idna==3.3
 python-engineio==4.3.1
 python-socketio==5.5.2
+requests==2.27.1
 six==1.16.0
+urllib3==1.26.9
 websockets==10.2
