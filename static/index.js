@@ -2,8 +2,11 @@ const sio = io();
 
 sio.on('connect', () => {
   console.log('connected');
-  sio.emit('check_rune', {rune_id:2}, (result) =>{
-    console.log(result, "asdfghjklwertyuio");
+  sio.emit('choose_player', {"username": "leila", "role": "saver"}, (ready) =>{
+    console.log(ready, "asdfghjklwertyuio");
+});
+sio.emit('choose_player', {"username": "leila", "role": "explorer"}, (ready) =>{
+    console.log(ready, "asdfghjklwertyuio");
 });
 
 sio.on('rune_check', (count) => {
@@ -16,7 +19,7 @@ sio.on('disconnect', () => {
   console.log('disconnected');
 });
 
-sio.on('choose_player', {user:'explorer'}, (ready) =>{
+sio.on('choose_player', {"username": "leila", "role": "solver"}, (ready) =>{
     console.log(ready);
 });
 
