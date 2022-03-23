@@ -1,4 +1,5 @@
-from game import Game, Player
+import re
+from game import Game, Player, Rune
 
 
 
@@ -13,7 +14,7 @@ class GameMaster:
 
         # Register it
         self.games.append(game)
-        print(self.games, 'after creating the game')
+        print(self.games, 'AFTER creating the game')
         return game
 
     def get_game(self, game_id):
@@ -21,6 +22,7 @@ class GameMaster:
         game = None
 
         for running_game in self.games:
+            print(running_game)
             if running_game.game_id == game_id:
                 game = running_game
                 break
@@ -60,4 +62,15 @@ class PlayerMaster:
 
         return player
     
+    
 
+class RuneMaster:
+    def __init__(self):
+        # Init the list of players managed by this player master
+        self.rune = []
+
+    def create_rune(self, rune_id, value, color, rune_count, max_response_time, each_side_count, sides_count):
+        rune = Rune(rune_id, value, color, rune_count, max_response_time, each_side_count, sides_count)
+        self.rune.append(rune)
+        return rune
+        

@@ -1,7 +1,8 @@
 from datetime import datetime
 import requests
+import json
 import socketio
-from game_master import GameMaster, PlayerMaster
+from game_master import GameMaster, PlayerMaster, RuneMaster
 
 sio = socketio.Server(cors_allowed_origins='*')
 main = socketio.WSGIApp(sio, static_files={
@@ -11,11 +12,8 @@ main = socketio.WSGIApp(sio, static_files={
 game_master = GameMaster()
 now = datetime.now()
 play_master = PlayerMaster()
+rune_master = RuneMaster()
 
-
-
-rune_api = requests.get("http://vahiddev-001-site1.htempurl.com/api/Runes")
-print(rune_api.json())
 
 
 #sid is session id, it is assigned to client when it connects, 
@@ -43,17 +41,24 @@ def choose_player(sid, data):
 
 
 @sio.event
-def start_game(sid, data):
-    username = data[0]
-    role = data[1]
-    game_id = 123
-    game = game_master.get_game(game_id)
+def start_game(sid):
+    players = play_master.players
+    api = requests.get("https://runecube.herokuapp.com/api/Runes")
+    rune_api = api.json()
+    game_id = 123  #random id to test get_game func
+    game = game_master.get_game(game_id=game_id)
+    rune = rune_master.create_rune(rune_id=rune_api["id"], value=rune_api["value"], 
+        color=rune_api["color"], rune_count=rune_api["count"], max_response_time=rune_api["maxResponseTime"], 
+        each_side_count=rune_api["eachSideCount"], sides_count=rune_api["sidesCount"])
+
     if not game:
-        game = game_master.create_game(game_id= game_id, start_time=now, correct_rune=1)
+        game = game_master.create_game(game_id=game_id, start_time=now, correct_rune=rune)
 
-    game.add_player(username, role)
+    game.add_player(players=players)
+    json_game = json.dumps(game.__dict__, default=str)
+    print("",json_game)
 
-    return True
+    return json_game
 
     
 # @sio.event
