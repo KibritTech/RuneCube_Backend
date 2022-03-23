@@ -66,11 +66,17 @@ class PlayerMaster:
 
 class RuneMaster:
     def __init__(self):
-        # Init the list of players managed by this player master
         self.rune = []
 
-    def create_rune(self, rune_id, value, color, rune_count, max_response_time, each_side_count, sides_count):
-        rune = Rune(rune_id, value, color, rune_count, max_response_time, each_side_count, sides_count)
+    def create_rune(self, id, value, color, count, max_response_time, each_side_count, sides_count):
+        rune = Rune(id, value, color, count, max_response_time, each_side_count, sides_count)
         self.rune.append(rune)
         return rune
+
+    def get_rune(self):
+        for rune in self.rune:
+            return rune
+
+
+
         

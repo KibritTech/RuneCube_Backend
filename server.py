@@ -1,8 +1,8 @@
 from datetime import datetime
-import requests
-import json
+import requests, json
 import socketio
 from game_master import GameMaster, PlayerMaster, RuneMaster
+from game import Rune
 
 sio = socketio.Server(cors_allowed_origins='*')
 main = socketio.WSGIApp(sio, static_files={
@@ -47,8 +47,8 @@ def start_game(sid):
     rune_api = api.json()
     game_id = 123  #random id to test get_game func
     game = game_master.get_game(game_id=game_id)
-    rune = rune_master.create_rune(rune_id=rune_api["id"], value=rune_api["value"], 
-        color=rune_api["color"], rune_count=rune_api["count"], max_response_time=rune_api["maxResponseTime"], 
+    rune = rune_master.create_rune(id=rune_api["id"], value=rune_api["value"], 
+        color=rune_api["color"], count=rune_api["count"], max_response_time=rune_api["maxResponseTime"], 
         each_side_count=rune_api["eachSideCount"], sides_count=rune_api["sidesCount"])
 
     if not game:
@@ -61,22 +61,19 @@ def start_game(sid):
     return json_game
 
     
-# @sio.event
-# def check_rune(sid, data):
-#     incoming_rune = data['value']
-#     incoming_color = data['color']
-#     print(incoming_color, incoming_rune, 'musa check')
-#     global rune_count
-#     cc = Rune()
-#     print(cc.rune_count)
-#     rune_count = cc.rune_count
-#     if rune_id == cc.rune_id:
-#         if rune_count > 0:
-#             rune_count -= 1
-#             print(rune_count, 'rune count123')
-#             sio.emit('rune_check', rune_count)
-#         sio.emit('rune_check', {'data': 'Rune side finished'})
-#     sio.emit('rune_check',  {'data': 'Ne tot Rune'})
+@sio.event
+def check_rune(sid, data):
+    incoming_rune = data['value']
+    incoming_color = data['color']
+    rune = rune_master.get_rune()
+    if incoming_rune == rune.value and incoming_color==rune.color:
+        if rune.count > 0:
+            rune.count -= 1
+            sio.emit('rune_check', rune.count)
+        sio.emit('rune_check', {'data': "Rune's side has been completed"})
+    else:
+        return False
+
         
 
     

@@ -9,10 +9,6 @@ sio.emit('choose_player', {"username": "nermin", "role": "explorer"}, (start_gam
     console.log(start_game, "asdfghjklwertyuio");
 });
 
-// sio.on('rune_check', (count) => {
-//     console.log(count.data);
-// })
-
 sio.emit('start_game', (game) => {
     console.log(game, 'qqqqqqqqqqq');
 })
@@ -27,4 +23,8 @@ sio.on('disconnect', () => {
 sio.on('choose_player', {"username": "leila", "role": "solver"}, (ready) =>{
     console.log(ready);
 });
+
+sio.emit('check_rune', {"value": "cycle", "color": "red"}, (count) => {
+    console.log(count, 'cccccccccccccccc');
+})
 
