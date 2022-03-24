@@ -12,7 +12,6 @@ sio.emit('choose_player', {"username": "nermin", "role": "explorer"}, (start_gam
 sio.emit('start_game', (game) => {
     console.log(game, 'qqqqqqqqqqq');
 })
-
 });
 
 
