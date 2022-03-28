@@ -35,7 +35,7 @@ class Game:
 
 
 class Rune:
-    def __init__(self,id, value, color, count, max_response_time, each_side_count, sides_time ):
+    def __init__(self, value, color, count, max_response_time, each_side_count, sides_time ):
         """
         :param rune_count: how many runes will be in each side
         :param max_response_time: The time given to a player to answer a question
@@ -43,7 +43,7 @@ class Rune:
         :param sides_count: How many sides will have a rune (it is fixed )
         :return:
         """
-        self.id = id
+        # self.id = id
         self.value = value
         self.count = count
         self.color = color

@@ -71,8 +71,8 @@ class RuneMaster:
     def __init__(self):
         self.runes = []
 
-    def create_rune(self, id, value, color, count, max_response_time, each_side_count, sides_time):
-        rune = Rune(id, value, color, count, max_response_time, each_side_count, sides_time)
+    def create_rune(self, value, color, count, max_response_time, each_side_count, sides_time):
+        rune = Rune( value, color, count, max_response_time, each_side_count, sides_time)
         self.runes.append(rune)
         print(self.runes)
         return rune

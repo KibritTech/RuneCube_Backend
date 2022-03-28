@@ -35,8 +35,8 @@ def disconnect(sid):
 
 @sio.event
 def choose_player(sid, data):
-    incoming_role = list(data.items())[1][1] # data that user sends
-    incoming_username = list(data.items())[0][1]
+    incoming_role = data["role"] # data that user sends
+    incoming_username = data["username"]
     print(incoming_role, "coming role")
     print(incoming_username, 'username')
     role = play_master.create_player(player_role=incoming_role, player_username=incoming_username)
@@ -56,7 +56,7 @@ def start_game(sid):
     ending_story = story["storyEndPrompt"]
     game_id = 123  #random id to test get_game func
     game = game_master.get_game(game_id=game_id)
-    rune = rune_master.create_rune(id=rune_api["id"], value=rune_api["value"], 
+    rune = rune_master.create_rune(value=rune_api["value"], 
         color=rune_api["color"], count=rune_api["count"], max_response_time=rune_api["maxResponseTime"], 
         each_side_count=rune_api["eachSideCount"], sides_time=rune_api["sidesCount"])
 
@@ -64,20 +64,23 @@ def start_game(sid):
         game = game_master.create_game(game_id=game_id, start_time=now)
 
     game.add_player(players=players)
-    json_rune = json.dumps(rune.__dict__, default=str)
+    # json_rune = json.dumps(rune.__dict__, default=str)
     # json_game = json.dumps(game.__dict__, default=str)
     # print("",json_game)
 
-    return [json_rune, {"start_story": beginning_story}, {"end_story": ending_story}]
+    return [rune_api, {"start_story": beginning_story}, {"end_story": ending_story}]
 
 
     
 @sio.event
 def check_rune(sid, data):
-    incoming_id = data["id"]
+    # incoming_id = data["id"]
     incoming_rune = data['value']
+    print(incoming_rune, 'musa check value')
+    
     incoming_color = data['color']
-    rune = rune_master.get_rune(rune_id=incoming_id)
+    print(incoming_color, 'musa check color')
+    rune = rune_master.get_rune(incoming_rune=incoming_rune)
     if incoming_rune == rune.value and incoming_color==rune.color:
         if rune.count > 0:
             rune.count -= 1
@@ -85,7 +88,7 @@ def check_rune(sid, data):
         else:
             api = requests.get("https://runecube.herokuapp.com/api/Runes")
             rune_api = api.json()
-            rune = rune_master.create_rune(id=rune_api["id"], value=rune_api["value"], 
+            rune = rune_master.create_rune(value=rune_api["value"], 
             color=rune_api["color"], count=rune_api["count"], max_response_time=rune_api["maxResponseTime"], 
             each_side_count=rune_api["eachSideCount"], sides_time=rune_api["sidesCount"])
             return rune

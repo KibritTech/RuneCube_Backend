@@ -23,7 +23,7 @@ sio.on('choose_player', {"username": "leila", "role": "solver"}, (ready) =>{
     console.log(ready);
 });
 
-sio.emit('check_rune', {"value": "cycle", "color": "red"}, (count) => {
-    console.log(count, 'cccccccccccccccc');
-})
+// sio.emit('check_rune', {"value": "cycle", "color": "red"}, (count) => {
+//     console.log(count, 'cccccccccccccccc');
+// })
 
