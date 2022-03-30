@@ -7,15 +7,19 @@ class Player:
 
 
 class Game:
-    def __init__(self, game_id, start_time, spend_time=None, finish_time=None,  game_finished=False):
+    def __init__(self, game_id, start_time, count, max_response_time, each_side_count, sides_time,
+                spend_time=None, finish_time=None,  game_finished=False):
         self.game_id = game_id
         self.start_time = start_time
         self.spend_time = spend_time
         self.game_finished = game_finished
         self.finish_time = finish_time 
+        self.count = count
+        self.max_response_time = max_response_time
+        self.each_side_count = each_side_count
+        self.sides_time = sides_time
         self.players = []
         self.runes = []
-        # self.game_map = game_map
         
     
     def add_player(self, players):
@@ -35,7 +39,7 @@ class Game:
 
 
 class Rune:
-    def __init__(self, value, color, count, max_response_time, each_side_count, sides_time ):
+    def __init__(self,id, value, color):
         """
         :param rune_count: how many runes will be in each side
         :param max_response_time: The time given to a player to answer a question
@@ -43,10 +47,7 @@ class Rune:
         :param sides_count: How many sides will have a rune (it is fixed )
         :return:
         """
-        # self.id = id
+        self.id = id
         self.value = value
-        self.count = count
         self.color = color
-        self.max_response_time = max_response_time
-        self.each_side_count = each_side_count
-        self.sides_time = sides_time
+
