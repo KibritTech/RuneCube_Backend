@@ -43,19 +43,14 @@ class RuneMaster:
         rune = Rune(id, value, color)
         if rune not in self.runes:
             self.runes.append(rune)
-            print(self.runes, 'all runes are here')
         return rune
 
     def get_rune(self, rune_id):
         rune = None
-
         for active_rune in self.runes:
-            print(rune, "get rune func1")
-            print(active_rune.id, 'active rune id all here')
             if active_rune.id == rune_id :
                 rune = active_rune
-                print(rune, "get rune func2")
-            return rune
+        return rune
 
 
 

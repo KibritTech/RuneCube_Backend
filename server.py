@@ -9,7 +9,7 @@ main = socketio.WSGIApp(sio, static_files={
     '/':'./static/'
 })
 
-random_number =  random.randint(0,23)
+
 play_master = PlayerMaster()
 
 
@@ -47,31 +47,33 @@ def choose_player(sid, data):
 def check_rune(sid, data):
     incoming_rune = data['value']    
     incoming_color = data['color']
-    print(current_rune_id[0], 'rune id is here')
     rune = rune_master.get_rune(rune_id=current_rune_id[0])
-    print(rune, 'rune return...........')
     game = game_master.get_game()
     new_rune_object = []
 
-
     if incoming_rune == rune.value and incoming_color==rune.color:
-        print('they are same')
         if game.count > 1: 
             game.count -= 1
+            new_rune_object = get_new_rune()
             sio.emit('rune_check', [game.count, new_rune_object])
         else:
             game.count = 5
-            new_rune_object = gs.rune_api[random_number]
-            print('...........',new_rune_object, '............')
-            current_rune_id[0] = new_rune_object["id"]
-            rune = rune_master.create_rune(id=new_rune_object ["id"], value=new_rune_object["value"], color=new_rune_object["color"])
+            new_rune_object = get_new_rune()
             sio.emit('rune_check', [game.count, new_rune_object]) 
     else:
-        sio.emit('rune_check', [{'data': "runes are not same"}, game.count, new_rune_object])
-        # return False
+        print("they are not same")
+        new_rune_object = get_new_rune()
+        game.count = 5
+        sio.emit('rune_check', [game.count, new_rune_object, {'data': "Runes are not same"}]) 
         
 
     
+def get_new_rune():
+    random_number =  random.randint(0,23)
+    new_rune_object = gs.rune_api[random_number]
+    current_rune_id[0] = new_rune_object["id"]
+    rune = rune_master.create_rune(id=new_rune_object["id"], value=new_rune_object["value"], color=new_rune_object["color"])
+    return new_rune_object
 
         
 
