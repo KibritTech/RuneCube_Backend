@@ -19,11 +19,16 @@ sio.on('disconnect', () => {
   console.log('disconnected');
 });
 
+// sio.emit('finish_time', (result) => {
+//     console.log(result, 'finis time...........')
+//   });
+
 // sio.on('choose_player', {"username": "leila", "role": "solver"}, (ready) =>{
 //     console.log(ready);
 // });
 
-sio.emit('check_rune', {"value": "Cylinder", "color": "Green"}, (count) => {
+sio.emit('check_rune', {"value": "Circle", "color": "Yellow"}, (count) => {
     console.log(count, 'cccccccccccccccc');
 });
 
+    

@@ -59,6 +59,7 @@ rune_master = RuneMaster()
 random_number =  random.randint(0,23)
 rune_api = []
 current_rune_id = [0]
+countdown_time = 0
 
 
 
@@ -92,6 +93,8 @@ class PlayerMaster:
                     story = story_api.json()
                     settings_api = requests.get("https://runecube.herokuapp.com/api/settings")
                     settings = settings_api.json()
+                    global countdown_time
+                    countdown_time = settings["maxResponseTime"]
                     beginning_story = story["storyStartPrompt"]
                     ending_story = story["storyEndPrompt"]
                     game_id = 123  #random id to test get_game func
