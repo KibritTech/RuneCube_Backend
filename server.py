@@ -41,7 +41,7 @@ def choose_player(sid, data):
     print(role,'printing choose player return') #if I create game here, I can't check for the first user bcz it still returns false even after adding
     return role
 
-
+open_map_side = 0
   
 @sio.event
 def check_rune(sid, data):
@@ -53,37 +53,63 @@ def check_rune(sid, data):
 
     if incoming_rune == rune.value and incoming_color==rune.color:
         if game.count > 0: 
+            print(game.count, 'before minus')
             game.count -= 1
+            print(game.count, 'after minus')
             new_rune_object = get_new_rune()
-            if game.count == 0:   #check game count again, because it decreases before this if and may be it is zero now
-                # game.count = 5
-                test = 5
-                sio.emit('change_side', [test, new_rune_object])
-            sio.emit('update_rune', [game.count, new_rune_object])
-        else: 
-            print('...........................correct rune finished...........................')
-            game.count = 5
-            new_rune_object = get_new_rune()
-            sio.emit('change_side', [game.count, new_rune_object])
-            game.each_side_count -= 1
-            print('',game.each_side_count)
-            if game.each_side_count == 0:
-                print('...........................GAME COUNT .........', game.each_side_count)
-                game.finish_time = datetime.now()
-                players = play_master.players
-                first_user = players[0]
-                second_user = players[1]
-                username1 = first_user.player_username
-                username2 = second_user.player_username
-                role1 = first_user.player_role
-                role2 = second_user.player_role
-                spent_time = game.finish_time - game.start_time
-                spent_time_json = json.dumps(spent_time,default=str)
-                username1_json = json.dumps(username1, default=str)
-                username2_json = json.dumps(username2, default=str)
-                role1_json = json.dumps(role1, default=str)
-                role2_json = json.dumps(role2, default=str)
-                sio.emit('finish_game', [username1_json, role1_json, username2_json, role2_json, spent_time_json])
+            if game.count == 0:   #check game count again, because it decreases before this if condition and may be it is zero now
+                game.count = 5
+                print('...........................correct rune finished...........................')
+                game.count = 5
+                new_rune_object = get_new_rune()
+                sio.emit('change_side', [game.count, new_rune_object])
+                game.each_side_count -= 1
+                global open_map_side
+                open_map_side += 1
+                sio.emit('open_map', open_map_side)
+                if game.each_side_count == 0:
+                    print('...........................GAME COUNT .........', game.each_side_count)
+                    game.finish_time = datetime.now()
+                    players = play_master.players
+                    first_user = players[0]
+                    second_user = players[1]
+                    username1 = first_user.player_username
+                    username2 = second_user.player_username
+                    role1 = first_user.player_role
+                    role2 = second_user.player_role
+                    spent_time = game.finish_time - game.start_time
+                    spent_time_json = json.dumps(spent_time,default=str)
+                    username1_json = json.dumps(username1, default=str)
+                    username2_json = json.dumps(username2, default=str)
+                    role1_json = json.dumps(role1, default=str)
+                    role2_json = json.dumps(role2, default=str)
+                    sio.emit('finish_game', [username1_json, role1_json, username2_json, role2_json, spent_time_json])
+            else:
+                sio.emit('update_rune', [game.count, new_rune_object])
+        # else: 
+        #     print('...........................correct rune finished...........................')
+        #     game.count = 5
+        #     new_rune_object = get_new_rune()
+        #     sio.emit('change_side', [game.count, new_rune_object])
+        #     game.each_side_count -= 1
+        #     print('vvvvvvvvvv',game.each_side_count)
+        #     if game.each_side_count == 0:
+        #         print('...........................GAME COUNT .........', game.each_side_count)
+        #         game.finish_time = datetime.now()
+        #         players = play_master.players
+        #         first_user = players[0]
+        #         second_user = players[1]
+        #         username1 = first_user.player_username
+        #         username2 = second_user.player_username
+        #         role1 = first_user.player_role
+        #         role2 = second_user.player_role
+        #         spent_time = game.finish_time - game.start_time
+        #         spent_time_json = json.dumps(spent_time,default=str)
+        #         username1_json = json.dumps(username1, default=str)
+        #         username2_json = json.dumps(username2, default=str)
+        #         role1_json = json.dumps(role1, default=str)
+        #         role2_json = json.dumps(role2, default=str)
+        #         sio.emit('finish_game', [username1_json, role1_json, username2_json, role2_json, spent_time_json])
     else:
         print("they are not same")
         new_rune_object = get_new_rune()
@@ -93,7 +119,7 @@ def check_rune(sid, data):
     
 def get_new_rune():
     random_number =  random.randint(0,23)
-    new_rune_object = gs.rune_api[1]
+    new_rune_object = gs.rune_api[random_number]
     current_rune_id[0] = new_rune_object["id"]
     rune = rune_master.create_rune(id=new_rune_object["id"], value=new_rune_object["value"], color=new_rune_object["color"])
     print(new_rune_object, '||||||||||||||||||||||||')

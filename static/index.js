@@ -27,7 +27,7 @@ sio.on('disconnect', () => {
 //     console.log(ready);
 // });
 
-sio.emit('check_rune', {"value": "Circle", "color": "Yellow"}, (count) => {
+sio.emit('check_rune', {"value": "Cube", "color": "Green"}, (count) => {
     console.log(count, 'cccccccccccccccc');
 });
 
