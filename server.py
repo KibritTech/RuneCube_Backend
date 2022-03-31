@@ -65,10 +65,8 @@ def check_rune(sid, data):
             game.count = 5
             new_rune_object = get_new_rune()
             sio.emit('change_side', [game.count, new_rune_object])
-            open_map_side = 0
             game.each_side_count -= 1
-            open_map_side += 1
-            sio.emit('open_map', open_map_side)
+            print('',game.each_side_count)
             if game.each_side_count == 0:
                 print('...........................GAME COUNT .........', game.each_side_count)
                 game.finish_time = datetime.now()
