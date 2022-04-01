@@ -16,7 +16,10 @@ sio.on('connect', () => {
 
 
 sio.on('disconnect', () => {
-  console.log('disconnected');
+//   console.log('disconnected', reason);
+//   sio.emit('reconnect', {"username": "ekber"}, (ready) => {
+//       console.log(ready, "reconnect")
+//   })
 });
 
 // sio.emit('finish_time', (result) => {
@@ -27,7 +30,7 @@ sio.on('disconnect', () => {
 //     console.log(ready);
 // });
 
-sio.emit('check_rune', {"value": "Cube", "color": "Green"}, (count) => {
+sio.emit('check_rune', {"value": "Circle", "color": "Yellow"}, (count) => {
     console.log(count, 'cccccccccccccccc');
 });
 

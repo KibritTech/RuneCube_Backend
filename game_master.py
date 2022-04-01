@@ -1,5 +1,5 @@
 import requests, random
-from datetime import datetime
+from datetime import datetime as dt
 from game import Game, Player, Rune
 
 
@@ -101,9 +101,10 @@ class PlayerMaster:
                     game = game_master.get_game()
                     rune = rune_master.create_rune(id=current_rune_object["id"], value=current_rune_object["value"],color=current_rune_object["color"])
                     if game == None: 
-                        game = game_master.create_game(game_id=game_id, start_time=datetime.now(), count=settings["count"], 
-                    max_response_time=settings["maxResponseTime"], each_side_count=settings["eachSideCount"], sides_time=settings["sidesTime"])
+                        game = game_master.create_game(game_id=game_id, start_time=dt.now(), count=settings["count"], 
+                    max_response_time=settings["maxResponseTime"], each_side_count=1, sides_time=settings["sidesTime"])
                     game.add_player(players=players)
+                    print(game, 'game test milliseconds')
                     start_game = True
                     result = [current_rune_object, {"start_story": beginning_story}, {"end_story": ending_story}, settings]
         return [start_game, result]

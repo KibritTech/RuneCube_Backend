@@ -1,6 +1,5 @@
 class Player:
     def __init__(self, player_username, player_role):
-        # self.player_sid = player_sid
         self.player_username = player_username
         self.player_role = player_role
 
