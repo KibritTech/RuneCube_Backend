@@ -3,7 +3,7 @@ import random, socketio, json, requests
 import time
 from game_master import PlayerMaster, game_master, rune_master, current_rune_id
 import game_master as gs #import it like this so can get rune_api
-
+from threading import Timer
 
 sio = socketio.Server(cors_allowed_origins='*')
 main = socketio.WSGIApp(sio, static_files={
@@ -20,15 +20,15 @@ online_users = []
 #sid is session id, it is assigned to client when it connects, 
 #environ is a dict that has all the details from client request like if they have any errors or cookies in environ
 @sio.event
-def connect(sid, data):
-    for user in online_users:
-        if user["online"] == False:
-            user["sid"] = sid
-            user["online"] = True
-            print(user, "found offline user made it online")
-        else:
-            print(sid, 'no user was offline')
+def connect(sid, environ):
     print(f"client with {sid} connected")
+    game = game_master.get_game()
+    print(game, ' GAME IN CONNECT')
+    if game != None: 
+        print('there is ongoing game')
+        sio.emit('ongoing_game', True)
+    else:
+        sio.emit('ongoing_game', False)
 
 
 
@@ -36,33 +36,46 @@ def connect(sid, data):
 def disconnect(sid):
     print(f"client with {sid} disconnected")
     for user in online_users:
-        print(user, '........................')
         if user["sid"] == sid:
             user["online"] = False
+            timing.start()
+            #call func here to start countdown, if time is zero then delete the game
+            print("User ", user, ' is disconnected')
+
             
-        else:
-            print("not same")
-            
-    # for game in game_master.game:
-    #     game.remove_player(player_username=player_username)
 
 @sio.event
-def reconnect(sid, data):
-    print(data, 'data is her in reconnect')
+def user_reconnected(sid, data):
+    username = data["username"]
+    role = data["role"]
+    if role != " ":
+        for user in online_users:
+            active_username = user["username"]
+            active_role = user["role"]
+            if username == active_username and role == active_role :
+                if user["online"] == False :
+                    timing.cancel()
+                    us_sid = data["sid"]
+                    user["sid"] = us_sid
+                    user["online"] = True
+                    # sio.emit("user_reconnected", True)
+
 
 @sio.event
 def choose_player(sid, data):
     incoming_role = data["role"] #data that user sends
     incoming_username = data["username"]
-    print(data["sid"], "data siddddddddd")
-    if data["sid"]: 
-        user_data = {"username1": data["username"], "sid": data["sid"], "online": True}
+    print(data, 'choose player data')
+    if incoming_username != " " and incoming_role != " ": 
+        user_data = {"username": incoming_username, "role": incoming_role, "sid": data["sid"], "online": True}
         online_users.append(user_data)
-    print(incoming_role, "coming role")
-    print(incoming_username, 'username')
+    print(incoming_role, "choose player coming role")
+    print(incoming_username, 'choose player incoming username')
     role = play_master.create_player( player_role=incoming_role, player_username=incoming_username)
     print(role,'printing choose player return') #if I create game here, I can't check for the first user bcz it still returns false even after adding
     sio.emit("choose_player", role) 
+
+
 
 open_map_side = 0
   
@@ -82,7 +95,7 @@ def check_rune(sid, data):
             new_rune_object = get_new_rune()
             if game.count == 0:   #check game count again, because it decreases before this if condition and may be it is zero now
                 game.count = 5
-                print('...........................correct rune finished...........................')
+                print('...........................   correct rune finished...........................')
                 game.count = 5
                 new_rune_object = get_new_rune()
                 sio.emit('change_side', [game.count, new_rune_object])
@@ -159,6 +172,17 @@ def rune_time(sid):
 
 # countdown_thread = threading.Thread(target=countdown)
 # countdown_thread.start()
+
+
+def timeout():
+    sio.emit('finish_game', True)
+    print("Game Finished")
+
+
+timing = Timer(30.0, timeout)
+
+# # wait for time completion
+# timing.join()
     
 
    

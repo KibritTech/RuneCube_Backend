@@ -5,7 +5,7 @@ sio.on('connect', () => {
 //   sio.emit('choose_player', {"username": "leila", "role": "saver"}, (start_game) =>{
 //     console.log(start_game, "checking leila");
 // });
-// sio.emit('choose_player', {"username": "nermin", "role": "explorer"}, (start_game) =>{
+// sio.emit('choose_player', {"username": "nermin", "role": "explorer", "sid": sio.id}, (start_game) =>{
 //     console.log(start_game, "asdfghjklwertyuio");
 // });
 
@@ -22,7 +22,7 @@ sio.on('disconnect', () => {
 //   })
 });
 
-// sio.emit('finish_time', (result) => {
+// sio.on('finish_game', (result) => {
 //     console.log(result, 'finis time...........')
 //   });
 
