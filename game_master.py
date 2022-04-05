@@ -17,7 +17,6 @@ class GameMaster:
         # Register it
         self.games.append(game)
         print(self.games, 'AFTER CREATING THE GAME')
-
         return game
 
     def get_game(self):
@@ -25,13 +24,13 @@ class GameMaster:
         print('inside get game func')
         for game in self.games:
             return game
-        
-        # game = None
-        # for running_game in self.games: 
-        #     print( 'inside for looooooooooop ')
-        #     if running_game.game_id == game_id:
-        #         game = running_game
-        # return game
+    
+
+    def delete_game(self):
+        print('inside delete game method func')
+        self.games.clear()
+        print(self.games, ' games list after clearing')
+            
     
 
 
@@ -104,7 +103,6 @@ class PlayerMaster:
                         game = game_master.create_game(game_id=game_id, start_time=dt.now(), count=settings["count"], 
                     max_response_time=settings["maxResponseTime"], each_side_count=1, sides_time=settings["sidesTime"])
                     game.add_player(players=players)
-                    print(game, 'game test milliseconds')
                     start_game = True
                     result = [current_rune_object, {"start_story": beginning_story}, {"end_story": ending_story}, settings]
         return [start_game, result]
@@ -119,12 +117,3 @@ class PlayerMaster:
                 player = active_player
                 break
         return player
-
-    
-    
-
-
-
-
-
-        

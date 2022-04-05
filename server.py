@@ -38,7 +38,7 @@ def disconnect(sid):
     for user in online_users:
         if user["sid"] == sid:
             user["online"] = False
-            timing.start()
+            countdown.start()
             #call func here to start countdown, if time is zero then delete the game
             print("User ", user, ' is disconnected')
 
@@ -52,13 +52,11 @@ def user_reconnected(sid, data):
         for user in online_users:
             active_username = user["username"]
             active_role = user["role"]
-            if username == active_username and role == active_role :
-                if user["online"] == False :
-                    timing.cancel()
+            if (username == active_username and role == active_role)  and user["online"] == False:
+                    countdown.cancel()
                     us_sid = data["sid"]
                     user["sid"] = us_sid
                     user["online"] = True
-                    # sio.emit("user_reconnected", True)
 
 
 @sio.event
@@ -104,27 +102,10 @@ def check_rune(sid, data):
                 open_map_side += 1
                 sio.emit('open_map', open_map_side)
                 if game.each_side_count == 0:
-                    print('...........................         GAME COUNT .........', game.each_side_count)
-                    game.finish_time = dt.now()
-                    players = play_master.players
-                    first_user = players[0]
-                    second_user = players[1]
-                    username1 = first_user.player_username
-                    username2 = second_user.player_username
-                    role1 = first_user.player_role
-                    role2 = second_user.player_role
-                    subtract_time = game.finish_time - game.start_time
-                    spent_time = str(subtract_time).split(".")[0]                    
-                    spent_time_json = json.dumps(spent_time,default=str)
-                    username1_json = json.dumps(username1, default=str)
-                    username2_json = json.dumps(username2, default=str)
-                    role1_json = json.dumps(role1, default=str)
-                    role2_json = json.dumps(role2, default=str)
-                    payload = {'username1': username1, 'role1': role1, 'username2': username2, 'spent_time': spent_time }
-                    posted_game_data = requests.post(leaderboard_url, json=payload)
-                    print(posted_game_data.json(), 'posted game data')
-                    time.sleep(4)
-                    sio.emit('finish_game', [username1_json, role1_json, username2_json, role2_json, spent_time_json])
+                    print('.............................GAME COUNT...............', game.each_side_count)
+                    send_data_api(is_finished=True)
+                    time.sleep(4) #wait for user to see the map 
+                    sio.emit('finish_game')
             else:
                 sio.emit('update_rune', [game.count, new_rune_object])
     else:
@@ -133,6 +114,7 @@ def check_rune(sid, data):
         game.count = 5
         sio.emit('change_side', [game.count, new_rune_object]) 
         
+
     
 def get_new_rune():
     random_number =  random.randint(0,23)
@@ -161,28 +143,41 @@ def rune_time(sid):
 
 
 
-# def countdown():
-#     global my_timer
-#     my_timer = 10
-#     while my_timer > 0:
-#         time.sleep(2)
-#         print('hereeee')
-#         my_timer -= 1
-
-
-# countdown_thread = threading.Thread(target=countdown)
-# countdown_thread.start()
-
-
 def timeout():
+    send_data_api(is_finished=False)
     sio.emit('finish_game', True)
     print("Game Finished")
 
 
-timing = Timer(30.0, timeout)
+countdown = Timer(30.0, timeout)
 
 # # wait for time completion
 # timing.join()
+
+
+def send_data_api(is_finished):
+    print(is_finished, "is finished value")
+    game = game_master.get_game()
+    game.finish_time = dt.now()
+    players = play_master.players
+    first_user = players[0]
+    second_user = players[1]
+    username1 = first_user.player_username
+    username2 = second_user.player_username
+    role1 = first_user.player_role
+    role2 = second_user.player_role
+    subtract_time = game.finish_time - game.start_time
+    spent_time = str(subtract_time).split(".")[0]                    
+    payload = {'username1': username1, 'role1': role1, 'username2': username2, 'spent_time': spent_time, 
+    'is_finished': is_finished}
+    posted_game_data = requests.post(leaderboard_url, json=payload)
+    print(posted_game_data.json(), 'posted game data')
+    game.remove_players()
+    game_master.delete_game()
+
+    
+
+
     
 
    

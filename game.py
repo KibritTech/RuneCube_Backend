@@ -25,12 +25,11 @@ class Game:
         self.players.extend(players)
         print(self.players, 'after extending the players list')
 
-    def remove_player(self, player_username):
-        # Get the player corresponding to the given sid and remove it if it is found
-        player = self.get_player(player_username)
-        
-        if player:
-            self.players.remove(player)
+    def remove_players(self):
+        print('inside remove players func')
+        self.players.clear()
+        print(self.players, 'players list after clearing it')
+
 
     def add_rune(self, rune):
         self.runes.append(rune)

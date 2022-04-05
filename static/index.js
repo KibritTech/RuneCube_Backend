@@ -22,15 +22,15 @@ sio.on('disconnect', () => {
 //   })
 });
 
-// sio.on('finish_game', (result) => {
-//     console.log(result, 'finis time...........')
-//   });
+sio.on('finish_game', (result) => {
+    console.log(result, 'finis time...........')
+  });
 
 // sio.on('choose_player', {"username": "leila", "role": "solver"}, (ready) =>{
 //     console.log(ready);
 // });
 
-sio.emit('check_rune', {"value": "Circle", "color": "Yellow"}, (count) => {
+sio.emit('check_rune', {"value": "Cylinder", "color": "Yellow"}, (count) => {
     console.log(count, 'cccccccccccccccc');
 });
 
