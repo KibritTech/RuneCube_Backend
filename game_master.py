@@ -55,7 +55,7 @@ class RuneMaster:
 
 game_master = GameMaster()
 rune_master = RuneMaster()
-random_number =  random.randint(0,23)
+random_number =  random.randint(0,15)
 rune_api = []
 current_rune_id = [0]
 countdown_time = 0

@@ -23,7 +23,7 @@ online_users = []
 def connect(sid, environ):
     print(f"client with {sid} connected")
     game = game_master.get_game()
-    print(game, ' GAME IN CONNECT')
+    print(game, ' GAME STATUS IN CONNECT')
     if game != None: 
         print('there is ongoing game')
         sio.emit('ongoing_game', True)
@@ -38,11 +38,12 @@ def disconnect(sid):
     for user in online_users:
         if user["sid"] == sid:
             user["online"] = False
-            countdown.start()
-            #call func here to start countdown, if time is zero then delete the game
+            print('timing is not alive')
+            global c
+            c = func_thread()
+            c.start() #call func here to start countdown, if time is zero then delete the game
             print("User ", user, ' is disconnected')
 
-            
 
 @sio.event
 def user_reconnected(sid, data):
@@ -53,10 +54,12 @@ def user_reconnected(sid, data):
             active_username = user["username"]
             active_role = user["role"]
             if (username == active_username and role == active_role)  and user["online"] == False:
-                    countdown.cancel()
-                    us_sid = data["sid"]
-                    user["sid"] = us_sid
-                    user["online"] = True
+                print("............")
+                print(c, 'GLOBAL C VARIABLE')
+                c.cancel()
+                us_sid = data["sid"]
+                user["sid"] = us_sid
+                user["online"] = True
 
 
 @sio.event
@@ -117,7 +120,7 @@ def check_rune(sid, data):
 
     
 def get_new_rune():
-    random_number =  random.randint(0,23)
+    random_number =  random.randint(0,15)
     new_rune_object = gs.rune_api[1]
     current_rune_id[0] = new_rune_object["id"]
     rune = rune_master.create_rune(id=new_rune_object["id"], value=new_rune_object["value"], color=new_rune_object["color"])
@@ -149,10 +152,17 @@ def timeout():
     print("Game Finished")
 
 
-countdown = Timer(30.0, timeout)
 
-# # wait for time completion
-# timing.join()
+# timing = Timer(20.0, timeout)
+
+threads = []
+
+def func_thread():    
+    timing = Timer(20.0, timeout)
+    threads.append(timing)
+    print(threads, "ALL THREADS")
+    return timing
+
 
 
 def send_data_api(is_finished):
@@ -174,12 +184,3 @@ def send_data_api(is_finished):
     print(posted_game_data.json(), 'posted game data')
     game.remove_players()
     game_master.delete_game()
-
-    
-
-
-    
-
-   
-
-
