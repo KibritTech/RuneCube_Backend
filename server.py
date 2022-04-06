@@ -39,9 +39,9 @@ def disconnect(sid):
         if user["sid"] == sid:
             user["online"] = False
             print('timing is not alive')
-            global c
-            c = func_thread()
-            c.start() #call func here to start countdown, if time is zero then delete the game
+            global timer_object
+            timer_object = func_thread()
+            timer_object.start() #call func here to start countdown, if time is zero then delete the game
             print("User ", user, ' is disconnected')
 
 
@@ -54,9 +54,8 @@ def user_reconnected(sid, data):
             active_username = user["username"]
             active_role = user["role"]
             if (username == active_username and role == active_role)  and user["online"] == False:
-                print("............")
-                print(c, 'GLOBAL C VARIABLE')
-                c.cancel()
+                print(timer_object, 'GLOBAL timer_object VARIABLE')
+                timer_object.cancel()
                 us_sid = data["sid"]
                 user["sid"] = us_sid
                 user["online"] = True
@@ -106,9 +105,10 @@ def check_rune(sid, data):
                 sio.emit('open_map', open_map_side)
                 if game.each_side_count == 0:
                     print('.............................GAME COUNT...............', game.each_side_count)
-                    send_data_api(is_finished=True)
-                    time.sleep(4) #wait for user to see the map 
-                    sio.emit('finish_game')
+                    api_return = send_data_api(is_finished=True)
+                    if api_return:
+                        time.sleep(4) #wait for user to see the map 
+                        sio.emit('finish_game')
             else:
                 sio.emit('update_rune', [game.count, new_rune_object])
     else:
@@ -147,18 +147,18 @@ def rune_time(sid):
 
 
 def timeout():
-    send_data_api(is_finished=False)
-    sio.emit('finish_game', True)
-    print("Game Finished")
+    api_return = send_data_api(is_finished=False)
+    if api_return:
+        sio.emit('finish_game', True)
+        print("Game Finished")
 
 
 
-# timing = Timer(20.0, timeout)
 
 threads = []
 
 def func_thread():    
-    timing = Timer(20.0, timeout)
+    timing = Timer(12.0, timeout)
     threads.append(timing)
     print(threads, "ALL THREADS")
     return timing
@@ -181,6 +181,10 @@ def send_data_api(is_finished):
     payload = {'username1': username1, 'role1': role1, 'username2': username2, 'spent_time': spent_time, 
     'is_finished': is_finished}
     posted_game_data = requests.post(leaderboard_url, json=payload)
-    print(posted_game_data.json(), 'posted game data')
-    game.remove_players()
-    game_master.delete_game()
+    if posted_game_data:
+        game.remove_players()
+        game_master.delete_game()
+        return True
+    else:
+        return False
+    
