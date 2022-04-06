@@ -57,6 +57,7 @@ def user_reconnected(sid, data):
             if (username == active_username and role == active_role)  and user["online"] == False:
                 print(timer_object, 'GLOBAL timer_object VARIABLE')
                 timer_object.cancel()
+                print(data["sid"], "                DATA SID OBJECT")
                 us_sid = data["sid"]
                 user["sid"] = us_sid
                 user["online"] = True
