@@ -47,9 +47,9 @@ def disconnect(sid):
 
 @sio.event
 def user_reconnected(sid, data):
+    print('PRINTING INCOMING DATA FROM CLIENT IN USER RECONNECT', data)
     username = data["username"]
     role = data["role"]
-    print('PRINTING INCOMING DATA FROM CLIENT IN USER RECONNECT', data)
     if role != " ":
         for user in online_users:
             active_username = user["username"]
