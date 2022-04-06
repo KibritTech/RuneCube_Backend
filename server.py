@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-import random, socketio, json, requests
+import random, socketio, requests
 import time
 from game_master import PlayerMaster, game_master, rune_master, current_rune_id
 import game_master as gs #import it like this so can get rune_api
@@ -133,17 +133,19 @@ def get_new_rune():
 def side_time(sid):
     print('  SIDE time finished they are calling meeee')
     game = game_master.get_game()
-    game.count = 5
-    new_rune_object = get_new_rune()
-    return  [game.count, new_rune_object]
+    if game != None:
+        game.count = 5
+        new_rune_object = get_new_rune()
+        return  [game.count, new_rune_object]
 
 
 @sio.event
 def rune_time(sid):
     print(' RUNE time finished they are calling meeee')
     game = game_master.get_game()
-    new_rune_object = get_new_rune()
-    return  [game.count, new_rune_object]
+    if game != None:
+        new_rune_object = get_new_rune()
+        return  [game.count, new_rune_object]
 
 
 
