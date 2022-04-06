@@ -47,7 +47,7 @@ def disconnect(sid):
 
 @sio.event
 def user_reconnected(sid, data):
-    print('PRINTING INCOMING DATA FROM CLIENT IN USER RECONNECT', username, role)
+    print('PRINTING INCOMING DATA FROM CLIENT IN USER RECONNECT', data)
     username = data["username"]
     role = data["role"]
     if role != " ":
@@ -88,6 +88,7 @@ def check_rune(sid, data):
     rune = rune_master.get_rune(rune_id=current_rune_id[0])
     game = game_master.get_game()
     new_rune_object = []
+    print(rune.value, rune.color, "rune in me ...............")
 
     if incoming_rune == rune.value and incoming_color==rune.color:
         if game.count > 0: 
