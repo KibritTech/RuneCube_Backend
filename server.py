@@ -49,6 +49,7 @@ def disconnect(sid):
 def user_reconnected(sid, data):
     username = data["username"]
     role = data["role"]
+    print('PRINTING INCOMING DATA FROM CLIENT IN USER RECONNECT', username, role)
     if role != " ":
         for user in online_users:
             active_username = user["username"]
