@@ -171,26 +171,27 @@ def func_thread():
 def send_data_api(is_finished):
     print(is_finished, "is finished value")
     game = game_master.get_game()
-    game.finish_time = dt.now()
-    players = play_master.players
-    first_user = players[0]
-    second_user = players[1]
-    username1 = first_user.player_username
-    username2 = second_user.player_username
-    role1 = first_user.player_role
-    role2 = second_user.player_role
-    subtract_time = game.finish_time - game.start_time
-    spent_time = str(subtract_time).split(".")[0]                    
-    payload = {'username1': username1, 'role1': role1, 'username2': username2, 'spent_time': spent_time, 
-    'is_finished': is_finished}
-    posted_game_data = requests.post(leaderboard_url, json=payload)
-    if posted_game_data:
-        game.remove_players()
-        game_master.delete_game()
-        print(play_master.players, 'delete players object ')
-        play_master.delete_players()
-        print(play_master.players, 'delete players object after')
-        return True
-    else:
-        return False
+    if game != None:
+        game.finish_time = dt.now()
+        players = play_master.players
+        first_user = players[0]
+        second_user = players[1]
+        username1 = first_user.player_username
+        username2 = second_user.player_username
+        role1 = first_user.player_role
+        role2 = second_user.player_role
+        subtract_time = game.finish_time - game.start_time
+        spent_time = str(subtract_time).split(".")[0]                    
+        payload = {'username1': username1, 'role1': role1, 'username2': username2, 'spent_time': spent_time, 
+        'is_finished': is_finished}
+        posted_game_data = requests.post(leaderboard_url, json=payload)
+        if posted_game_data:
+            game.remove_players()
+            game_master.delete_game()
+            print(play_master.players, 'delete players object ')
+            play_master.delete_players()
+            print(play_master.players, 'delete players object after')
+            return True
+        else:
+            return False
     
