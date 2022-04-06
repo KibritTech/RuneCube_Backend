@@ -122,7 +122,7 @@ def check_rune(sid, data):
     
 def get_new_rune():
     random_number =  random.randint(0,15)
-    new_rune_object = gs.rune_api[1]
+    new_rune_object = gs.rune_api[random_number]
     current_rune_id[0] = new_rune_object["id"]
     rune = rune_master.create_rune(id=new_rune_object["id"], value=new_rune_object["value"], color=new_rune_object["color"])
     print(new_rune_object, '||||||||||||||||||||||||')
@@ -159,7 +159,7 @@ def timeout():
 threads = []
 
 def func_thread():    
-    timing = Timer(12.0, timeout)
+    timing = Timer(20.0, timeout)
     threads.append(timing)
     print(threads, "ALL THREADS")
     return timing
@@ -185,6 +185,7 @@ def send_data_api(is_finished):
     if posted_game_data:
         game.remove_players()
         game_master.delete_game()
+        play_master.delete_players()
         return True
     else:
         return False

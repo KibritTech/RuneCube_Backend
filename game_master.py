@@ -106,6 +106,10 @@ class PlayerMaster:
                     start_game = True
                     result = [current_rune_object, {"start_story": beginning_story}, {"end_story": ending_story}, settings]
         return [start_game, result]
+    
+    def delete_players(self):
+        self.players.clear()
+        self.roles.clear()
 
 
     def get_player(self, player_username):
