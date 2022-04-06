@@ -185,7 +185,9 @@ def send_data_api(is_finished):
     if posted_game_data:
         game.remove_players()
         game_master.delete_game()
+        print(play_master.players, 'delete players object ')
         play_master.delete_players()
+        print(play_master.players, 'delete players object after')
         return True
     else:
         return False
