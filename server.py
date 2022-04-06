@@ -47,7 +47,7 @@ def disconnect(sid):
 
 @sio.event
 def user_reconnected(sid, data):
-    print('PRINTING INCOMING DATA FROM CLIENT IN USER RECONNECT', data)
+    print('PRINTING INCOMING DATA FROM CLIENT IN USER RECONNECT', username, role)
     username = data["username"]
     role = data["role"]
     if role != " ":
@@ -57,7 +57,6 @@ def user_reconnected(sid, data):
             if (username == active_username and role == active_role)  and user["online"] == False:
                 print(timer_object, 'GLOBAL timer_object VARIABLE')
                 timer_object.cancel()
-                print(data["sid"], "                DATA SID OBJECT")
                 us_sid = data["sid"]
                 user["sid"] = us_sid
                 user["online"] = True
@@ -83,6 +82,7 @@ open_map_side = 0
   
 @sio.event
 def check_rune(sid, data):
+    print(data, " CHECK RUNE MUSA DATA")
     incoming_rune = data['value']    
     incoming_color = data['color']
     rune = rune_master.get_rune(rune_id=current_rune_id[0])
