@@ -74,7 +74,7 @@ class PlayerMaster:
         start_game = False
         result = []
         
-        if player_role != " ":
+        if player_role != " " and player_username != " ":
             player = Player(player_username, player_role)
             if player_role in self.roles:
                 return [start_game, f"{player_role} is already taken! Pick another one"]
