@@ -103,10 +103,12 @@ def check_rune(sid, data):
                 sio.emit('change_side', [game.count, new_rune_object])
                 print("BEFORE DECREASING EACH SIDE COUNT", game.each_side_count)
                 game.each_side_count -= 1
+                print("GAME MAP COUNT BEFORE PLUS", open_map_side)
                 global open_map_side
                 open_map_side += 1
+                print("GAME MAP COUNT AFTER PLUS", open_map_side)
                 sio.emit('open_map', open_map_side)
-                print("GAME EACH SIDE COUNT AFTER -1", game.each_side_count)
+                print("GAME EACH SIDE COUNT AFTER ", game.each_side_count)
                 if game.each_side_count == 0:
                     print('.............................GAME COUNT...............', game.each_side_count)
                     api_return = send_data_api(is_finished=True)
