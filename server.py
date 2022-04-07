@@ -103,7 +103,6 @@ def check_rune(sid, data):
                 sio.emit('change_side', [game.count, new_rune_object])
                 print("BEFORE DECREASING EACH SIDE COUNT", game.each_side_count)
                 game.each_side_count -= 1
-                print("GAME MAP COUNT BEFORE PLUS", open_map_side)
                 global open_map_side
                 open_map_side += 1
                 print("GAME MAP COUNT AFTER PLUS", open_map_side)
