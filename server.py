@@ -164,7 +164,7 @@ def timeout():
 threads = []
 
 def func_thread():    
-    timing = Timer(20.0, timeout)
+    timing = Timer(14.0, timeout)
     threads.append(timing)
     print(threads, "ALL THREADS")
     return timing
