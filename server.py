@@ -151,10 +151,8 @@ def rune_time(sid):
 def timeout():
     api_return = send_data_api(is_finished=False)
     if api_return:
-        print("OPENED MAP COUNT IN TIMEOUT BEFORE ASSIGNING ", len(found_side_object))
         global found_side_object
         found_side_object = []
-        print("OPENED MAP COUNT  AFTER ASSINGING TO ZERO", len(found_side_object))
         sio.emit('finish_game', True)
         print("Game Finished")
 
