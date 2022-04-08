@@ -119,7 +119,7 @@ def check_rune(sid, data):
     else:
         print("they are not same")
         new_rune_object = get_new_rune()
-        game.count = 5
+        # game.count = 5
         sio.emit('change_side', [game.count, new_rune_object]) 
         
 
@@ -138,7 +138,7 @@ def side_time(sid):
     print('  SIDE time finished they are calling meeee')
     game = game_master.get_game()
     if game != None:
-        game.count = 5
+        # game.count = 5
         new_rune_object = get_new_rune()
         return  [game.count, new_rune_object]
 
