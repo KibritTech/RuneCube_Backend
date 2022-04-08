@@ -109,7 +109,7 @@ def check_rune(sid, data):
                     print('.............................FOUND SIDE OBJECT AFTER SIDE AND MAP EQUAL...............', found_side_object)
                     api_return = send_data_api(is_finished=True)
                     if api_return:
-                        time.sleep(4) #wait for user to see the map 
+                        time.sleep(3) #wait for user to see the map 
                         sio.emit('finish_game')
             else:
                 sio.emit('update_rune', [game.count, new_rune_object])
@@ -162,7 +162,7 @@ def timeout():
 threads = []
 
 def func_thread():    
-    timing = Timer(14.0, timeout)
+    timing = Timer(12.0, timeout)
     threads.append(timing)
     print(threads, "ALL THREADS")
     return timing
