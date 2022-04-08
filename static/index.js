@@ -2,12 +2,12 @@ const sio = io();
 
 sio.on('connect', () => {
   console.log('connected');
-  sio.emit('choose_player', {"username": "efletun", "role": "saver", "sid": sio.id}, (start_game) =>{
-    console.log(start_game, "checking leila");
-});
-// sio.emit('choose_player', {"username": "ekber", "role": "explorer", "sid": sio.id}, (start_game) =>{
-//     console.log(start_game, "asdfghjklwertyuio");
+//   sio.emit('choose_player', {"username": "efletun", "role": "saver", "sid": sio.id}, (start_game) =>{
+//     console.log(start_game, "checking leila");
 // });
+sio.emit('choose_player', {"username": "ekber", "role": "explorer", "sid": sio.id}, (start_game) =>{
+    console.log(start_game, "asdfghjklwertyuio");
+});
 
 // sio.emit('start_game', (game) => {
 //     console.log(game, 'qqqqqqqqqqq');
