@@ -112,11 +112,11 @@ def check_rune(sid, data):
                         time.sleep(3) #wait for user to see the map 
                         sio.emit('finish_game')
             else:
-                sio.emit('update_rune', [game.count, new_rune_object])
+                sio.emit('update_rune', [game.count, new_rune_object, "right"])
     else:
         print("they are not same")
         new_rune_object = get_new_rune()
-        sio.emit('change_side', [game.count, new_rune_object]) 
+        sio.emit('change_side', [game.count, new_rune_object, "wrong"]) 
         
 
     
