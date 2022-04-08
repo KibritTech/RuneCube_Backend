@@ -77,8 +77,8 @@ def choose_player(sid, data):
     sio.emit("choose_player", role) 
 
 
+found_side_object = []
 
-  
 @sio.event
 def check_rune(sid, data):
     print(data, " CHECK RUNE MUSA DATA")
@@ -87,8 +87,7 @@ def check_rune(sid, data):
     rune = rune_master.get_rune(rune_id=current_rune_id[0])
     game = game_master.get_game()
     new_rune_object = []
-    found_side_object = []
-    print(found_side_object, '111111111FIRSTTTT FOUND SIDE COUNT')
+    print(found_side_object, 'FIRSTTTT FOUND Object SIDE COUNT')
     print(rune.value, rune.color, "rune in me ...............")
 
     if incoming_rune == rune.value and incoming_color==rune.color:
@@ -103,7 +102,7 @@ def check_rune(sid, data):
                 new_rune_object = get_new_rune()
                 sio.emit('change_side', [game.count, new_rune_object])
                 print("BEFORE DECREASING EACH SIDE COUNT", game.each_side_count)
-                found_side_object.append(1)
+                found_side_object.append("new side")
                 sio.emit('open_map', len(found_side_object))
                 print("GAME EACH SIDE COUNT AFTER ", len(found_side_object))
                 if game.each_side_count == len(found_side_object):
