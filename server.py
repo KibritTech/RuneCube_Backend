@@ -109,8 +109,9 @@ def check_rune(sid, data):
                     print('.............................FOUND SIDE OBJECT AFTER SIDE AND MAP EQUAL...............', found_side_object)
                     api_return = send_data_api(is_finished=True)
                     if api_return:
+                        sio.emit('finish_message', "finished")
                         time.sleep(3) #wait for user to see the map 
-                        sio.emit('finish_game', "finished")
+                        sio.emit('finish_game')
             else:
                 sio.emit('update_rune', [game.count, new_rune_object, "right"])
     else:
@@ -153,7 +154,7 @@ def timeout():
     if api_return:
         global found_side_object
         found_side_object = []
-        sio.emit('finish_game', "disconnected")
+        sio.emit('finish_game', True)
         print("Game Finished")
 
 
