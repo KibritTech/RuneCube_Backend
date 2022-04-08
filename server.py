@@ -106,7 +106,7 @@ def check_rune(sid, data):
                 print("OPENED MAP COUNT  ", len(found_side_object))
                 if game.each_side_count == len(found_side_object):
                     found_side_object = []
-                    print('.............................GAME COUNT...............', found_side_object)
+                    print('.............................FOUND SIDE OBJECT AFTER SIDE AND MAP EQUAL...............', found_side_object)
                     api_return = send_data_api(is_finished=True)
                     if api_return:
                         time.sleep(4) #wait for user to see the map 
