@@ -78,7 +78,6 @@ def choose_player(sid, data):
 
 
 
-found_side_count = 0
   
 @sio.event
 def check_rune(sid, data):
@@ -88,6 +87,8 @@ def check_rune(sid, data):
     rune = rune_master.get_rune(rune_id=current_rune_id[0])
     game = game_master.get_game()
     new_rune_object = []
+    found_side_object = []
+    print(found_side_object, '111111111FIRSTTTT FOUND SIDE COUNT')
     print(rune.value, rune.color, "rune in me ...............")
 
     if incoming_rune == rune.value and incoming_color==rune.color:
@@ -97,16 +98,16 @@ def check_rune(sid, data):
             print(game.count, 'after minus')
             new_rune_object = get_new_rune()
             if game.count == 0:   #check game count again, because it decreases before this if condition and may be it is zero now
-                game.count = 5
+                game.count = 3
                 print('...........................correct rune finished for one side finished...........................')
                 new_rune_object = get_new_rune()
                 sio.emit('change_side', [game.count, new_rune_object])
                 print("BEFORE DECREASING EACH SIDE COUNT", game.each_side_count)
-                found_side_count += 1
-                sio.emit('open_map', found_side_count)
-                print("GAME EACH SIDE COUNT AFTER ", found_side_count)
-                if game.each_side_count == found_side_count:
-                    print('.............................GAME COUNT...............', found_side_count)
+                found_side_object.append(1)
+                sio.emit('open_map', len(found_side_object))
+                print("GAME EACH SIDE COUNT AFTER ", len(found_side_object))
+                if game.each_side_count == len(found_side_object):
+                    print('.............................GAME COUNT...............', found_side_object)
                     api_return = send_data_api(is_finished=True)
                     if api_return:
                         time.sleep(4) #wait for user to see the map 
