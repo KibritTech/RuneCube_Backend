@@ -78,7 +78,7 @@ def choose_player(sid, data):
 
 
 
-open_map_side = 0
+
   
 @sio.event
 def check_rune(sid, data):
@@ -88,6 +88,7 @@ def check_rune(sid, data):
     rune = rune_master.get_rune(rune_id=current_rune_id[0])
     game = game_master.get_game()
     new_rune_object = []
+    open_map_side = 0
     print(rune.value, rune.color, "rune in me ...............")
 
     if incoming_rune == rune.value and incoming_color==rune.color:
@@ -103,7 +104,6 @@ def check_rune(sid, data):
                 sio.emit('change_side', [game.count, new_rune_object])
                 print("BEFORE DECREASING EACH SIDE COUNT", game.each_side_count)
                 game.each_side_count -= 1
-                global open_map_side
                 open_map_side += 1
                 print("GAME MAP COUNT AFTER PLUS", open_map_side)
                 sio.emit('open_map', open_map_side)
