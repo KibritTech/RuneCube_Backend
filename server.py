@@ -203,8 +203,8 @@ def send_data_api(is_finished):
 
 
 @sio.event
-def game_started():
-    print('increase count function has started')
+def game_started(sid):
+    print('inside count function has started')
     global start_game_count
     start_game_count += 1
     print('start_game_count after incresing', start_game_count)
