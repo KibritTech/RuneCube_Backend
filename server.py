@@ -76,7 +76,6 @@ def choose_player(sid, data):
     print(role,'printing choose player return') #if I create game here, I can't check for the first user bcz it still returns false even after adding
     sio.emit("choose_player", role) 
 
-
 found_side_object = []
 
 @sio.event
@@ -87,9 +86,7 @@ def check_rune(sid, data):
     rune = rune_master.get_rune(rune_id=current_rune_id[0])
     game = game_master.get_game()
     new_rune_object = []
-    print(found_side_object, 'FIRSTTTT FOUND Object SIDE COUNT')
     print(rune.value, rune.color, "rune in me ...............")
-
     if incoming_rune == rune.value and incoming_color==rune.color:
         if game.count > 0: 
             print(game.count, 'before minus')
@@ -102,10 +99,12 @@ def check_rune(sid, data):
                 new_rune_object = get_new_rune()
                 sio.emit('change_side', [game.count, new_rune_object])
                 print("BEFORE DECREASING EACH SIDE COUNT", game.each_side_count)
+                global found_side_object
                 found_side_object.append("new side")
                 sio.emit('open_map', len(found_side_object))
                 print("GAME EACH SIDE COUNT AFTER ", len(found_side_object))
                 if game.each_side_count == len(found_side_object):
+                    global found_side_object
                     found_side_object = []
                     print('.............................GAME COUNT...............', found_side_object)
                     api_return = send_data_api(is_finished=True)
@@ -117,7 +116,6 @@ def check_rune(sid, data):
     else:
         print("they are not same")
         new_rune_object = get_new_rune()
-        # game.count = 5
         sio.emit('change_side', [game.count, new_rune_object]) 
         
 
