@@ -106,6 +106,7 @@ def check_rune(sid, data):
                 sio.emit('open_map', len(found_side_object))
                 print("GAME EACH SIDE COUNT AFTER ", len(found_side_object))
                 if game.each_side_count == len(found_side_object):
+                    found_side_object = []
                     print('.............................GAME COUNT...............', found_side_object)
                     api_return = send_data_api(is_finished=True)
                     if api_return:
@@ -153,6 +154,8 @@ def rune_time(sid):
 def timeout():
     api_return = send_data_api(is_finished=False)
     if api_return:
+        global found_side_object
+        found_side_object = []
         sio.emit('finish_game', True)
         print("Game Finished")
 
