@@ -110,7 +110,7 @@ def check_rune(sid, data):
                     api_return = send_data_api(is_finished=True)
                     if api_return:
                         time.sleep(3) #wait for user to see the map 
-                        sio.emit('finish_game')
+                        sio.emit('finish_game', "finished")
             else:
                 sio.emit('update_rune', [game.count, new_rune_object, "right"])
     else:
@@ -140,7 +140,7 @@ def side_time(sid):
 
 @sio.event
 def rune_time(sid):
-    print(' RUNE time finished they are calling meeee')
+    print('RUNE time finished they are calling meeee')
     game = game_master.get_game()
     if game != None:
         new_rune_object = get_new_rune()
@@ -153,7 +153,7 @@ def timeout():
     if api_return:
         global found_side_object
         found_side_object = []
-        sio.emit('finish_game', True)
+        sio.emit('finish_game', "disconnected")
         print("Game Finished")
 
 
