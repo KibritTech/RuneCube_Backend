@@ -16,6 +16,7 @@ leaderboard_url = "https://runecube.herokuapp.com/api/leaderboards"
 
 
 online_users = []
+start_game_count = 0
 
 #sid is session id, it is assigned to client when it connects, 
 #environ is a dict that has all the details from client request like if they have any errors or cookies in environ
@@ -35,14 +36,16 @@ def connect(sid, environ):
 @sio.event
 def disconnect(sid):
     print(f"client with {sid} disconnected")
-    for user in online_users:
-        if user["sid"] == sid:
-            user["online"] = False
-            print('timing is not alive')
-            global timer_object
-            timer_object = func_thread()
-            timer_object.start() #call func here to start countdown, if time is zero then delete the game
-            print("User ", user, ' is disconnected')
+    print(start_game_count)
+    if start_game_count == 2:
+        for user in online_users:
+            if user["sid"] == sid:
+                user["online"] = False
+                print('timing is not alive')
+                global timer_object
+                timer_object = func_thread()
+                timer_object.start() #call func here to start countdown, if time is zero then delete the game
+                print("User ", user, ' is disconnected')
 
 
 @sio.event
@@ -95,10 +98,9 @@ def check_rune(sid, data):
             new_rune_object = get_new_rune()
             if game.count == 0:   #check game count again, because it decreases before this if condition and may be it is zero now
                 game.count = 3
-                print('...........................correct rune finished for one side finished...........................')
+                print('...........................correct rune count finished for one side...........................')
                 new_rune_object = get_new_rune()
                 sio.emit('change_side', [game.count, new_rune_object])
-                print("BEFORE DECREASING EACH SIDE COUNT", game.each_side_count)
                 global found_side_object 
                 found_side_object.append("new side")
                 print(found_side_object, 'found side object after appending')
@@ -106,7 +108,6 @@ def check_rune(sid, data):
                 print("OPENED MAP COUNT  ", len(found_side_object))
                 if game.each_side_count == len(found_side_object):
                     found_side_object = []
-                    print('.............................FOUND SIDE OBJECT AFTER SIDE AND MAP EQUAL...............', found_side_object)
                     api_return = send_data_api(is_finished=True)
                     if api_return:
                         sio.emit('finish_message', "finished")
@@ -154,6 +155,8 @@ def timeout():
     if api_return:
         global found_side_object
         found_side_object = []
+        # global start_game_count
+        # start_game_count = 0
         sio.emit('finish_game', True)
         print("Game Finished")
 
@@ -163,7 +166,7 @@ def timeout():
 threads = []
 
 def func_thread():    
-    timing = Timer(12.0, timeout)
+    timing = Timer(13.0, timeout)
     threads.append(timing)
     print(threads, "ALL THREADS")
     return timing
@@ -197,3 +200,9 @@ def send_data_api(is_finished):
         else:
             return False
     
+
+
+@sio.on('start_game')
+def increase_count():
+    global start_game_count
+    start_game_count += 1
