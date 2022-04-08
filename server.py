@@ -202,8 +202,8 @@ def send_data_api(is_finished):
     
 
 
-@sio.on('game_started')
-def increase_count():
+@sio.event('game_started')
+def game_started():
     print('increase count function has started')
     global start_game_count
     start_game_count += 1
