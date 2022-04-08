@@ -36,7 +36,7 @@ def connect(sid, environ):
 @sio.event
 def disconnect(sid):
     print(f"client with {sid} disconnected")
-    print(start_game_count)
+    print(start_game_count, 'start game count in disconnect event')
     if start_game_count == 2:
         for user in online_users:
             if user["sid"] == sid:
@@ -202,7 +202,13 @@ def send_data_api(is_finished):
     
 
 
-@sio.on('start_game')
+@sio.on('game_started')
 def increase_count():
+    print('increase count function has started')
     global start_game_count
     start_game_count += 1
+    print('start_game_count after incresing', start_game_count)
+    if start_game_count == 2:
+        sio.emit('game_started', True)
+    else:
+        sio.emit('game_started', False)
