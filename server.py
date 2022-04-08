@@ -1,5 +1,6 @@
 from datetime import datetime as dt
 import random, socketio, requests
+from tracemalloc import start
 import time
 from game_master import PlayerMaster, game_master, rune_master, current_rune_id
 import game_master as gs #import it like this so can get rune_api
@@ -16,7 +17,6 @@ leaderboard_url = "https://runecube.herokuapp.com/api/leaderboards"
 
 
 online_users = []
-start_game_count = 0
 
 #sid is session id, it is assigned to client when it connects, 
 #environ is a dict that has all the details from client request like if they have any errors or cookies in environ
@@ -36,12 +36,12 @@ def connect(sid, environ):
 @sio.event
 def disconnect(sid):
     print(f"client with {sid} disconnected")
-    print(start_game_count, 'start game count in disconnect event')
-    if start_game_count == 2:
+    print("online users in DISCONNECT ", online_users)
+    if "start_game" in online_users:
         for user in online_users:
             if user["sid"] == sid:
                 user["online"] = False
-                print('timing is not alive')
+                print('STARTING TIMER OBJECT IN DISCONNECT')
                 global timer_object
                 timer_object = func_thread()
                 timer_object.start() #call func here to start countdown, if time is zero then delete the game
@@ -81,6 +81,7 @@ def choose_player(sid, data):
 
 found_side_object = []
 
+
 @sio.event
 def check_rune(sid, data):
     print(data, " CHECK RUNE MUSA DATA")
@@ -108,8 +109,6 @@ def check_rune(sid, data):
                 print("OPENED MAP COUNT  ", len(found_side_object))
                 if game.each_side_count == len(found_side_object):
                     found_side_object = []
-                    global start_game_count
-                    start_game_count = 0
                     api_return = send_data_api(is_finished=True)
                     if api_return:
                         sio.emit('finish_message', "finished")
@@ -157,8 +156,6 @@ def timeout():
     if api_return:
         global found_side_object
         found_side_object = []
-        global start_game_count
-        start_game_count = 0
         sio.emit('finish_game', True)
         print("Game Finished")
 
@@ -195,7 +192,7 @@ def send_data_api(is_finished):
         if posted_game_data:
             game.remove_players()
             game_master.delete_game()
-            print(play_master.players, 'delete players object ')
+            print(play_master.players, 'delete players object before clearing it')
             play_master.delete_players()
             print(play_master.players, 'delete players object after')
             return True
@@ -203,14 +200,19 @@ def send_data_api(is_finished):
             return False
     
 
+start_game_count = 0
 
 @sio.event
 def game_started(sid):
-    print('inside count function has started')
+    print('inside count function !')
     global start_game_count
     start_game_count += 1
-    print('start_game_count after incresing', start_game_count)
+    print(start_game_count, "start game count in game started event check")
     if start_game_count == 2:
+        user_data = "start_game"
+        online_users.append(user_data)
         sio.emit('game_started', True)
+        print(online_users, 'Online users in game start after appending start game count')
+        start_game_count = 0
     else:
         sio.emit('game_started', False)
