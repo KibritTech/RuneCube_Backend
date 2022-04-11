@@ -114,6 +114,10 @@ def check_rune(sid, data):
                     found_side_object = []
                     api_return = send_data_api(is_finished=True)
                     if api_return:
+                        global online_users
+                        online_users = []
+                        global game_start_state
+                        game_start_state = []
                         sio.emit('finish_message', "finished")
                         time.sleep(3) #wait for user to see the map 
                         sio.emit('finish_game')
@@ -159,6 +163,10 @@ def timeout():
     if api_return:
         global found_side_object
         found_side_object = []
+        global online_users
+        online_users = []
+        global game_start_state
+        game_start_state = []
         sio.emit('finish_game', True)
         print("Game Finished")
 
@@ -168,7 +176,7 @@ def timeout():
 threads = []
 
 def func_thread():    
-    timing = Timer(13.0, timeout)
+    timing = Timer(12.0, timeout)
     threads.append(timing)
     print(threads, "ALL THREADS")
     return timing
