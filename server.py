@@ -37,7 +37,7 @@ def connect(sid, environ):
 def disconnect(sid):
     print(f"client with {sid} disconnected")
     print("online users in DISCONNECT ", online_users)
-    if "start_game" in online_users:
+    if {"start_game": True} in online_users:
         for user in online_users:
             if user["sid"] == sid:
                 user["online"] = False
@@ -209,7 +209,7 @@ def game_started(sid):
     start_game_count += 1
     print(start_game_count, "start game count in game started event check")
     if start_game_count == 2:
-        user_data = "start_game"
+        user_data = {"start_game": True}
         online_users.append(user_data)
         sio.emit('game_started', True)
         print(online_users, 'Online users in game start after appending start game count')
