@@ -17,6 +17,7 @@ leaderboard_url = "https://runecube.herokuapp.com/api/leaderboards"
 
 
 online_users = []
+game_start_state = []
 
 #sid is session id, it is assigned to client when it connects, 
 #environ is a dict that has all the details from client request like if they have any errors or cookies in environ
@@ -37,7 +38,9 @@ def connect(sid, environ):
 def disconnect(sid):
     print(f"client with {sid} disconnected")
     print("online users in DISCONNECT ", online_users)
-    if {"start_game": True} in online_users:
+    print("GAME START STATE IN DISCONNECT", game_start_state)
+    if True in game_start_state:
+        print('its trueeeeeeeeee')
         for user in online_users:
             if user["sid"] == sid:
                 user["online"] = False
@@ -209,10 +212,9 @@ def game_started(sid):
     start_game_count += 1
     print(start_game_count, "start game count in game started event check")
     if start_game_count == 2:
-        user_data = {"start_game": True}
-        online_users.append(user_data)
+        game_start_state.append(True)
         sio.emit('game_started', True)
-        print(online_users, 'Online users in game start after appending start game count')
+        print(game_start_state, 'Game start state in game start after appending start game count')
         start_game_count = 0
     else:
         sio.emit('game_started', False)
