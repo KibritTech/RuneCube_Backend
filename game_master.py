@@ -93,6 +93,7 @@ class GameMaster:
         # countdown_time = settings["maxResponseTime"]
         game_id = 123  #random id to test get_game func
         if self.games == []:
+            print('self games is empty')
             rune = rune_master.create_rune(id=current_rune_object["id"], value=current_rune_object["value"],color=current_rune_object["color"])
             game = Game(game_id=game_id, start_time=dt.now(), count=settings["count"], 
             max_response_time=settings["maxResponseTime"], each_side_count=settings["eachSideCount"], sides_time=settings["sidesTime"])
@@ -100,7 +101,8 @@ class GameMaster:
             game.add_player(players=players)
             self.games.append(game)
             rune_object = [current_rune_object, settings]
-        print(self.games, 'AFTER CREATING THE GAME')
+            print(rune_object, "RUNE")
+            print(self.games, 'AFTER CREATING THE GAME')
         return rune_object
 
     def get_game(self):

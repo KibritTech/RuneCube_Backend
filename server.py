@@ -88,7 +88,9 @@ def choose_player(sid, data):
 @sio.event
 def start_game(sid):
     chosen_players = play_master.players
+    print(chosen_players, "GET PLAYERS IN START GAME")
     if len(chosen_players) == 2:
+        print('length is 2 ')
         starting_game = game_master.create_game()
         sio.emit('start_game', starting_game)
 
