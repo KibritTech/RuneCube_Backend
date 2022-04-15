@@ -1,6 +1,5 @@
 from datetime import datetime as dt
 import random, socketio, requests
-from tracemalloc import start
 import time
 from game_master import PlayerMaster, game_master, rune_master, current_rune_id
 import game_master as gs #import it like this so can get rune_api
@@ -39,12 +38,12 @@ def disconnect(sid):
     print(f"client with {sid} disconnected")
     print("online users in DISCONNECT ", online_users)
     print("GAME START STATE IN DISCONNECT", game_start_state)
-    if True in game_start_state:
-        print('its trueeeeeeeeee')
-        for user in online_users:
-            if user["sid"] == sid:
-                user["online"] = False
-                print('STARTING TIMER OBJECT IN DISCONNECT')
+    for user in online_users:
+        if user["sid"] == sid:
+            user["online"] = False
+            print('STARTING TIMER OBJECT IN DISCONNECT')
+            if True in game_start_state:
+                print("inside Trueeee")
                 global timer_object
                 timer_object = func_thread()
                 timer_object.start() #call func here to start countdown, if time is zero then delete the game
@@ -54,6 +53,7 @@ def disconnect(sid):
 @sio.event
 def user_reconnected(sid, data):
     print('PRINTING INCOMING DATA FROM CLIENT IN USER RECONNECT', data)
+    print('PRINTING ONLINE USERS IN USER RECONNECT BEFORE CHANGING', online_users)
     username = data["username"]
     role = data["role"]
     if role != " ":
@@ -61,10 +61,10 @@ def user_reconnected(sid, data):
             active_username = user["username"]
             active_role = user["role"]
             if (username == active_username and role == active_role)  and user["online"] == False:
-                print(timer_object, 'GLOBAL timer_object VARIABLE')
+                print(timer_object, 'GLOBAL timer_object STARTED')
                 timer_object.cancel()
-                us_sid = data["sid"]
-                user["sid"] = us_sid
+                new_sid = data["sid"]
+                user["sid"] = new_sid
                 user["online"] = True
 
 
@@ -76,15 +76,25 @@ def choose_player(sid, data):
     if incoming_username != " " and incoming_role != " ": 
         user_data = {"username": incoming_username, "role": incoming_role, "sid": data["sid"], "online": True}
         online_users.append(user_data)
-    print(incoming_role, "choose player coming role")
-    print(incoming_username, 'choose player incoming username')
-    role = play_master.create_player( player_role=incoming_role, player_username=incoming_username)
-    print(role,'printing choose player return') #if I create game here, I can't check for the first user bcz it still returns false even after adding
-    sio.emit("choose_player", role) 
+        game_ready_obj = play_master.create_player(player_role=incoming_role, player_username=incoming_username)
+        print(game_ready_obj,'printing choose player return')
+        sio.emit("choose_player", game_ready_obj) 
+    else:
+        print(f"Either incoming_role: {incoming_role} or incoming_username: {incoming_username} is empty")
+
+
+
+
+@sio.event
+def start_game(sid):
+    chosen_players = play_master.players
+    if len(chosen_players) == 2:
+        starting_game = game_master.create_game()
+        sio.emit('start_game', starting_game)
+
+
 
 found_side_object = []
-
-
 @sio.event
 def check_rune(sid, data):
     print(data, " CHECK RUNE MUSA DATA")
@@ -119,7 +129,7 @@ def check_rune(sid, data):
                         global game_start_state
                         game_start_state = []
                         sio.emit('finish_message', "finished")
-                        time.sleep(3) #wait for user to see the map 
+                        time.sleep(2) #wait for user to see the map 
                         sio.emit('finish_game')
             else:
                 sio.emit('update_rune', [game.count, new_rune_object, "right"])
@@ -127,9 +137,9 @@ def check_rune(sid, data):
         print("they are not same")
         new_rune_object = get_new_rune()
         sio.emit('change_side', [game.count, new_rune_object, "wrong"]) 
-        
 
-    
+
+
 def get_new_rune():
     random_number =  random.randint(0,15)
     new_rune_object = gs.rune_api[random_number]
@@ -212,6 +222,8 @@ def send_data_api(is_finished):
     
 
 start_game_count = 0
+
+
 
 @sio.event
 def game_started(sid):
