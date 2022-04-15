@@ -61,11 +61,12 @@ def user_reconnected(sid, data):
             active_username = user["username"]
             active_role = user["role"]
             if (username == active_username and role == active_role)  and user["online"] == False:
-                print(timer_object, 'GLOBAL timer_object STARTED')
-                timer_object.cancel()
-                new_sid = data["sid"]
-                user["sid"] = new_sid
-                user["online"] = True
+                if True in game_start_state:
+                    print(timer_object, 'GLOBAL timer_object STARTED')
+                    timer_object.cancel()
+                    new_sid = data["sid"]
+                    user["sid"] = new_sid
+                    user["online"] = True
 
 
 @sio.event
