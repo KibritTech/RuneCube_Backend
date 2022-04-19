@@ -32,7 +32,6 @@ def connect(sid, environ):
         sio.emit('ongoing_game', False)
 
 
-
 @sio.event
 def disconnect(sid):
     print(f"client with {sid} disconnected")
@@ -41,12 +40,11 @@ def disconnect(sid):
     for user in online_users:
         if user["sid"] == sid:
             user["online"] = False
-            print('STARTING TIMER OBJECT IN DISCONNECT')
             if True in game_start_state:
-                print("inside Trueeee")
                 global timer_object
                 timer_object = func_thread()
                 timer_object.start() #call func here to start countdown, if time is zero then delete the game
+                print('STARTED TIMER OBJECT IN DISCONNECT')
                 print("User ", user, ' is disconnected')
 
 
@@ -70,7 +68,7 @@ def user_reconnected(sid, data):
                     timer_object.cancel()
 
 
-@sio.event
+@sio.on('choose_player')
 def choose_player(sid, data):
     incoming_role = data["role"] #data that user sends
     incoming_username = data["username"]
@@ -79,26 +77,30 @@ def choose_player(sid, data):
         user_data = {"username": incoming_username, "role": incoming_role, "sid": data["sid"], "online": True}
         online_users.append(user_data)
         game_ready_obj = play_master.create_player(player_role=incoming_role, player_username=incoming_username)
-        print(game_ready_obj,'printing choose player return')
+        print(game_ready_obj,'printing choose player return')        
         sio.emit("choose_player", game_ready_obj) 
     else:
         print(f"Either incoming_role: {incoming_role} or incoming_username: {incoming_username} is empty")
 
 
 
+entered_users_count = 0
 
 @sio.event
 def start_game(sid):
     chosen_players = play_master.players
     print(chosen_players, "GET PLAYERS IN START GAME")
-    if len(chosen_players) == 2:
+    global entered_users_count
+    entered_users_count += 1
+    if len(chosen_players) == 2 and entered_users_count == 2:
         print('length is 2 ')
-        starting_game = game_master.create_game()
-        sio.emit('start_game', starting_game)
+        rune_object = game_master.create_game()
+        sio.emit('start_game', rune_object)
 
 
 
 found_side_object = []
+
 @sio.event
 def check_rune(sid, data):
     print(data, " CHECK RUNE MUSA DATA")
@@ -109,7 +111,9 @@ def check_rune(sid, data):
     new_rune_object = []
     print(rune.value, rune.color, "rune in me ...............")
     if incoming_rune == rune.value and incoming_color==rune.color:
-        if game.count > 0: 
+        if game.count > 0:
+            response_timer_object.cancel()
+            response_timer_object.start() 
             print(game.count, 'before minus')
             game.count -= 1
             print(game.count, 'after minus')
@@ -136,11 +140,13 @@ def check_rune(sid, data):
                         time.sleep(2) #wait for user to see the map 
                         sio.emit('finish_game')
             else:
-                sio.emit('update_rune', [game.count, new_rune_object, "right"])
+                sio.emit('update_rune', [game.count, new_rune_object, "right"]) #right so front makes tick sign
     else:
+        response_timer_object.cancel()
+        response_timer_object.start()
         print("they are not same")
         new_rune_object = get_new_rune()
-        sio.emit('change_side', [game.count, new_rune_object, "wrong"]) 
+        sio.emit('change_side', [game.count, new_rune_object, "wrong"]) #right so front makes x sign
 
 
 
@@ -152,14 +158,6 @@ def get_new_rune():
     print(new_rune_object, '||||||||||||||||||||||||')
     return new_rune_object
 
-
-@sio.event
-def side_time(sid):
-    print('  SIDE time finished they are calling meeee')
-    game = game_master.get_game()
-    if game != None:
-        new_rune_object = get_new_rune()
-        return  [game.count, new_rune_object]
 
 
 @sio.event
@@ -185,15 +183,52 @@ def timeout():
         print("Game Finished")
 
 
-
-
 threads = []
 
 def func_thread():    
     timing = Timer(12.0, timeout)
     threads.append(timing)
-    print(threads, "ALL THREADS")
+    print(threads, "ALL THREADS AFTER DISCONNECT")
     return timing
+
+
+@sio.event
+def rune_time_finish():
+    print('  Rune time finished I am executingggg')
+    game = game_master.get_game()
+    if game != None:
+        new_rune_object = get_new_rune()
+        sio.emit('rune_time_finished', [game.count, new_rune_object])
+
+# @sio.event
+def side_time_finish():
+    print('  SIDE time finished I am executingggg')
+    game = game_master.get_game()
+    if game != None:
+        new_rune_object = get_new_rune()
+        sio.emit('side_time_finished', [game.count, new_rune_object])
+
+
+def countdown_max_response_time():    
+    game = game_master.get_game()
+    if game != None:
+        print(game.max_response_time, 'qwertytrewer')
+        print(type(game.max_response_time), 'type of max responseeee')
+        timing = Timer(game.max_response_time, rune_time_finish)
+        threads.append(timing)
+        print(timing, 'timer in countdown object response time')
+        return timing
+
+
+def countdown_side_time():    
+    game = game_master.get_game()
+    if game != None:
+        print(game.sides_time, 'qwertytrewer2222')
+        print(type(game.sides_time), 'type of max responseeee')
+        timing = Timer(game.sides_time, side_time_finish)
+        threads.append(timing)
+        print(timing, 'timer in countdown object side time')
+        return timing
 
 
 
@@ -236,6 +271,12 @@ def game_started(sid):
     if start_game_count == 2:
         game_start_state.append(True)
         sio.emit('game_started', True)
+        global response_timer_object
+        response_timer_object = countdown_max_response_time()
+        response_timer_object.start()
+        global side_timer_object
+        side_timer_object = countdown_side_time()
+        side_timer_object.start()
         print(game_start_state, 'Game start state in game start after appending start game count')
         start_game_count = 0
     else:
