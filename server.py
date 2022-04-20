@@ -2,6 +2,7 @@ from datetime import datetime as dt
 import random, socketio, requests
 import time
 from game_master import PlayerMaster, game_master, rune_master, current_rune_id
+# from game_master import length_rune_api as ls
 import game_master as gs #import it like this so can get rune_api
 from threading import Timer
 from reset_timer import TimerReset
@@ -99,6 +100,37 @@ def start_game(sid):
 
 
 
+start_game_count = 0
+
+@sio.event
+def game_started(sid):
+    print('inside count function !')
+    global start_game_count
+    start_game_count += 1
+    print(start_game_count, "start game count in game started event check")
+    if start_game_count == 2:
+        game_start_state.append(True)
+        sio.emit('game_started', True)
+        call_rune_time()
+        # global side_timer_object
+        # side_timer_object = countdown_side_time()
+        # side_timer_object.start()
+        print(game_start_state, 'Game start state in game start after appending start game count')
+        start_game_count = 0
+    else:
+        sio.emit('game_started', False)
+
+
+
+
+
+def call_rune_time():
+    global response_timer_object
+    response_timer_object = countdown_max_response_time()
+    response_timer_object.start()
+
+
+
 found_side_object = []
 
 @sio.event
@@ -113,8 +145,7 @@ def check_rune(sid, data):
     if incoming_rune == rune.value and incoming_color==rune.color:
         if game.count > 0:
             response_timer_object.cancel()
-            new_timer_object = countdown_max_response_time()
-            new_timer_object.start()
+            call_rune_time() #starts new rune timer thread
             print(game.count, 'before minus')
             game.count -= 1
             print(game.count, 'after minus')
@@ -144,7 +175,7 @@ def check_rune(sid, data):
                 sio.emit('update_rune', [game.count, new_rune_object, "right"]) #right so front makes tick sign
     else:
         response_timer_object.cancel()
-        response_timer_object.start()
+        call_rune_time()
         print("they are not same")
         new_rune_object = get_new_rune()
         sio.emit('change_side', [game.count, new_rune_object, "wrong"]) #right so front makes x sign
@@ -152,11 +183,11 @@ def check_rune(sid, data):
 
 
 def get_new_rune():
-    random_number =  random.randint(0,15)
+    random_number =  random.randint(0,gs.length_rune_api-1)
     new_rune_object = gs.rune_api[random_number]
     current_rune_id[0] = new_rune_object["id"]
     rune = rune_master.create_rune(id=new_rune_object["id"], value=new_rune_object["value"], color=new_rune_object["color"])
-    print(new_rune_object, '||||||||||||||||||||||||')
+    print('SENT RUNE ||||||||||||||||||||||||', new_rune_object)
     return new_rune_object
 
 
@@ -192,6 +223,8 @@ def func_thread():
     return timing
 
 
+
+
 def rune_time_finish():
     print('  Rune time finished I am executingggg')
     game = game_master.get_game()
@@ -211,11 +244,9 @@ def side_time_finish():
 def countdown_max_response_time():    
     game = game_master.get_game()
     if game != None:
-        print(game.max_response_time, 'qwertytrewer')
-        print(type(game.max_response_time), 'type of max responseeee')
         timing = TimerReset(game.max_response_time, rune_time_finish)
         threads.append(timing)
-        print(timing, 'timer in countdown object response time')
+        print(timing, 'timer in countdown response timer object')
         return timing
 
 
@@ -224,9 +255,9 @@ def countdown_side_time():
     if game != None:
         print(game.sides_time, 'qwertytrewer2222')
         print(type(game.sides_time), 'type of max responseeee')
-        timing = Timer(game.sides_time, side_time_finish)
+        timing = TimerReset(game.sides_time, side_time_finish)
         threads.append(timing)
-        print(timing, 'timer in countdown object side time')
+        print(timing, 'timer in countdown side timer object')
         return timing
 
 
@@ -259,24 +290,3 @@ def send_data_api(is_finished):
             return False
     
 
-start_game_count = 0
-
-@sio.event
-def game_started(sid):
-    print('inside count function !')
-    global start_game_count
-    start_game_count += 1
-    print(start_game_count, "start game count in game started event check")
-    if start_game_count == 2:
-        game_start_state.append(True)
-        sio.emit('game_started', True)
-        global response_timer_object
-        response_timer_object = countdown_max_response_time()
-        response_timer_object.start()
-        global side_timer_object
-        side_timer_object = countdown_side_time()
-        side_timer_object.start()
-        print(game_start_state, 'Game start state in game start after appending start game count')
-        start_game_count = 0
-    else:
-        sio.emit('game_started', False)

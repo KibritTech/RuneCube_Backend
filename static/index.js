@@ -4,10 +4,10 @@ sio.on('connect', () => {
   console.log('connected');
 //   sio.emit('choose_player', {"username": "akbar", "role": "saver", "sid": sio.id}, (start_game) =>{
 //     console.log(start_game, "checking leila");
-// // });
-sio.emit('choose_player', {"username": "ekber", "role": "explorer", "sid": sio.id}, (start_game) =>{
-    console.log(start_game, "asdfghjklwertyuio");
-});
+// });
+// sio.emit('choose_player', {"username": "ekber", "role": "explorer", "sid": sio.id}, (start_game) =>{
+//     console.log(start_game, "asdfghjklwertyuio");
+// });
 
 // sio.emit('start_game', (game) => {
 //     console.log(game, 'qqqqqqqqqqq');
@@ -30,9 +30,9 @@ sio.on('disconnect', () => {
 //     console.log(ready);
 // });
 
-// sio.emit('check_rune', {"value": "Sphere", "color": "Red"}, (count) => {
-//     console.log(count, 'cccccccccccccccc');
-// });
+sio.emit('check_rune', {"value": "Cylinder", "color": "Red"}, (count) => {
+    console.log(count, 'cccccccccccccccc');
+});
 
   // sio.emit('game_started', (count) => {
   //   console.log(count, 'game started');

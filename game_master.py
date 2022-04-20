@@ -68,16 +68,14 @@ class PlayerMaster:
 
 player_master = PlayerMaster()
 rune_master = RuneMaster()
-random_number =  random.randint(0,15)
 rune_api = []
 current_rune_id = [0]
-# countdown_time = 0
+# length_rune_api = 0
 
 
 
 class GameMaster:
     def __init__(self):
-        # Init the list of games managed by this game master
         self.games = []
 
     def create_game(self):
@@ -85,6 +83,10 @@ class GameMaster:
         api = requests.get("https://runecube.herokuapp.com/api/Runes")
         global rune_api
         rune_api = api.json()
+        global length_rune_api
+        length_rune_api = len(rune_api)
+        print(length_rune_api, 'LENGTH IS HERE')
+        random_number =  random.randint(1,length_rune_api)
         current_rune_object = rune_api[random_number]
         current_rune_id[0] = current_rune_object["id"]
         settings_api = requests.get("https://runecube.herokuapp.com/api/settings")
@@ -93,7 +95,7 @@ class GameMaster:
         # countdown_time = settings["maxResponseTime"]
         game_id = 123  #random id to test get_game func
         if self.games == []:
-            print('self games is empty')
+            print('self games are empty')
             rune = rune_master.create_rune(id=current_rune_object["id"], value=current_rune_object["value"],color=current_rune_object["color"])
             game = Game(game_id=game_id, start_time=dt.now(), count=settings["count"], 
             max_response_time=settings["maxResponseTime"], each_side_count=settings["eachSideCount"], sides_time=settings["sidesTime"])
