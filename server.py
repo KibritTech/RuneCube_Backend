@@ -4,6 +4,7 @@ import time
 from game_master import PlayerMaster, game_master, rune_master, current_rune_id
 import game_master as gs #import it like this so can get rune_api
 from threading import Timer
+from reset_timer import TimerReset
 
 sio = socketio.Server(cors_allowed_origins='*')
 main = socketio.WSGIApp(sio, static_files={
@@ -77,7 +78,7 @@ def choose_player(sid, data):
         user_data = {"username": incoming_username, "role": incoming_role, "sid": data["sid"], "online": True}
         online_users.append(user_data)
         game_ready_obj = play_master.create_player(player_role=incoming_role, player_username=incoming_username)
-        print(game_ready_obj,'printing choose player return')        
+        print(game_ready_obj,'printing choose player return') 
         sio.emit("choose_player", game_ready_obj) 
     else:
         print(f"Either incoming_role: {incoming_role} or incoming_username: {incoming_username} is empty")
@@ -85,7 +86,6 @@ def choose_player(sid, data):
 
 
 entered_users_count = 0
-
 @sio.event
 def start_game(sid):
     chosen_players = play_master.players
@@ -113,7 +113,8 @@ def check_rune(sid, data):
     if incoming_rune == rune.value and incoming_color==rune.color:
         if game.count > 0:
             response_timer_object.cancel()
-            response_timer_object.start() 
+            new_timer_object = countdown_max_response_time()
+            new_timer_object.start()
             print(game.count, 'before minus')
             game.count -= 1
             print(game.count, 'after minus')
@@ -184,7 +185,6 @@ def timeout():
 
 
 threads = []
-
 def func_thread():    
     timing = Timer(12.0, timeout)
     threads.append(timing)
@@ -192,7 +192,6 @@ def func_thread():
     return timing
 
 
-@sio.event
 def rune_time_finish():
     print('  Rune time finished I am executingggg')
     game = game_master.get_game()
@@ -200,7 +199,7 @@ def rune_time_finish():
         new_rune_object = get_new_rune()
         sio.emit('rune_time_finished', [game.count, new_rune_object])
 
-# @sio.event
+
 def side_time_finish():
     print('  SIDE time finished I am executingggg')
     game = game_master.get_game()
@@ -214,7 +213,7 @@ def countdown_max_response_time():
     if game != None:
         print(game.max_response_time, 'qwertytrewer')
         print(type(game.max_response_time), 'type of max responseeee')
-        timing = Timer(game.max_response_time, rune_time_finish)
+        timing = TimerReset(game.max_response_time, rune_time_finish)
         threads.append(timing)
         print(timing, 'timer in countdown object response time')
         return timing
