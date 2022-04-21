@@ -112,9 +112,7 @@ def game_started(sid):
         game_start_state.append(True)
         sio.emit('game_started', True)
         call_rune_time()
-        # global side_timer_object
-        # side_timer_object = countdown_side_time()
-        # side_timer_object.start()
+        call_side_time()
         print(game_start_state, 'Game start state in game start after appending start game count')
         start_game_count = 0
     else:
@@ -222,7 +220,8 @@ def timeout():
         global game_start_state
         game_start_state = []
         sio.emit('finish_game', True)
-        rune_timer_object.cancel() 
+        rune_timer_object.cancel()
+        side_timer_object.cancel() 
         print("Game Finishedddddd")
 
 
