@@ -30,12 +30,10 @@ sio.on('disconnect', () => {
 //     console.log(ready);
 // });
 
-sio.emit('check_rune', {"value": "Cylinder", "color": "Red"}, (count) => {
+sio.emit('check_rune', {"value": "Torus", "color": "Pink"}, (count) => {
     console.log(count, 'cccccccccccccccc');
 });
 
   // sio.emit('game_started', (count) => {
   //   console.log(count, 'game started');
   // });
-
-    

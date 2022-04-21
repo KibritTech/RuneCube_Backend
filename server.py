@@ -122,12 +122,16 @@ def game_started(sid):
 
 
 
-
-
 def call_rune_time():
-    global response_timer_object
-    response_timer_object = countdown_max_response_time()
-    response_timer_object.start()
+    global rune_timer_object
+    rune_timer_object = countdown_max_response_time()
+    rune_timer_object.start()
+
+
+def call_side_time():
+    global side_timer_object
+    side_timer_object = countdown_side_time()
+    side_timer_object.start()
 
 
 
@@ -144,8 +148,8 @@ def check_rune(sid, data):
     print(rune.value, rune.color, "rune in me ...............")
     if incoming_rune == rune.value and incoming_color==rune.color:
         if game.count > 0:
-            response_timer_object.cancel()
-            call_rune_time() #starts new rune timer thread
+            rune_timer_object.cancel()
+            call_rune_time() #starts a new rune timer thread
             print(game.count, 'before minus')
             game.count -= 1
             print(game.count, 'after minus')
@@ -154,6 +158,8 @@ def check_rune(sid, data):
                 game.count = 3
                 print('...........................correct rune count finished for one side...........................')
                 new_rune_object = get_new_rune()
+                side_timer_object.cancel()
+                call_side_time()
                 sio.emit('change_side', [game.count, new_rune_object])
                 global found_side_object 
                 found_side_object.append("new side")
@@ -171,10 +177,14 @@ def check_rune(sid, data):
                         sio.emit('finish_message', "finished")
                         time.sleep(2) #wait for user to see the map 
                         sio.emit('finish_game')
+                        print("Game Finishedddddd")
+                        rune_timer_object.cancel()
+                        side_timer_object.cancel()
+
             else:
                 sio.emit('update_rune', [game.count, new_rune_object, "right"]) #right so front makes tick sign
     else:
-        response_timer_object.cancel()
+        rune_timer_object.cancel()
         call_rune_time()
         print("they are not same")
         new_rune_object = get_new_rune()
@@ -212,7 +222,8 @@ def timeout():
         global game_start_state
         game_start_state = []
         sio.emit('finish_game', True)
-        print("Game Finished")
+        rune_timer_object.cancel() 
+        print("Game Finishedddddd")
 
 
 threads = []
@@ -253,8 +264,6 @@ def countdown_max_response_time():
 def countdown_side_time():    
     game = game_master.get_game()
     if game != None:
-        print(game.sides_time, 'qwertytrewer2222')
-        print(type(game.sides_time), 'type of max responseeee')
         timing = TimerReset(game.sides_time, side_time_finish)
         threads.append(timing)
         print(timing, 'timer in countdown side timer object')

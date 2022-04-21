@@ -86,7 +86,7 @@ class GameMaster:
         global length_rune_api
         length_rune_api = len(rune_api)
         print(length_rune_api, 'LENGTH IS HERE')
-        random_number =  random.randint(1,length_rune_api)
+        random_number =  random.randint(1,length_rune_api-1)
         current_rune_object = rune_api[random_number]
         current_rune_id[0] = current_rune_object["id"]
         settings_api = requests.get("https://runecube.herokuapp.com/api/settings")
