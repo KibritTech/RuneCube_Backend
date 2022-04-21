@@ -62,8 +62,8 @@ def user_reconnected(sid, data):
             active_role = user["role"]
             if (username == active_username and role == active_role)  and user["online"] == False:
                 new_sid = data["sid"]
-                print('After changing sid to new sid users', online_users)
                 user["sid"] = new_sid
+                print('After changing sid to new sid users', online_users)
                 user["online"] = True
                 if True in game_start_state:
                     print(timer_object, 'GLOBAL timer_object STARTED')
@@ -88,20 +88,19 @@ def choose_player(sid, data):
 
 entered_users_count = 0
 @sio.event
-def start_game(sid):
+def read_story(sid):
     chosen_players = play_master.players
     print(chosen_players, "GET PLAYERS IN START GAME")
     global entered_users_count
     entered_users_count += 1
     if len(chosen_players) == 2 and entered_users_count == 2:
-        print('length is 2 ')
+        print('read_story length is 2  ')
         rune_object = game_master.create_game()
-        sio.emit('start_game', rune_object)
+        sio.emit('read_story', rune_object)
 
 
 
 start_game_count = 0
-
 @sio.event
 def game_started(sid):
     print('inside count function !')
