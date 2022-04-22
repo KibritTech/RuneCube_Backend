@@ -290,8 +290,10 @@ def send_data_api(is_finished):
 def end_game():
     game = game_master.get_game()
     if game != None:
+        print(found_side_object, 'found side object in end game map countt beforeeeeee...............')
         global found_side_object
         found_side_object = []
+        print(found_side_object, 'found side object in end game map countt afterrrr...............')
         global online_users
         online_users = []
         global game_start_state
