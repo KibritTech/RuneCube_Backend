@@ -48,11 +48,12 @@ def disconnect(sid):
                 timer_object.start() #call func here to start countdown, if time is zero then delete the game
                 print('STARTED TIMER OBJECT IN DISCONNECT')
                 print("User ", user, ' is disconnected')
-            elif entered_users_count == 0 :
-                print('disconnected before game started')
-                online_users.clear()
-                play_master.delete_players()
-                sio.emit('disconnect_before_start')
+            # elif entered_users_count == 0 :
+
+            #     print('disconnected before game started', entered_users_count)
+            #     online_users.clear()
+            #     play_master.delete_players()
+            #     sio.emit('disconnect_before_start')
 
 
 
