@@ -164,10 +164,10 @@ def check_rune(sid, data):
             if game.count == 0:   #check game count again, because it decreases before this if condition and may be it is zero now
                 game.count = 3
                 print('...........................correct rune count finished for one side...........................')
-                new_rune_object = get_new_rune()
+                # new_rune_object = get_new_rune()
                 side_timer_object.cancel()
                 call_side_time()
-                sio.emit('change_side', [game.count, new_rune_object])
+                sio.emit('change_side', [game.count, new_rune_object, "right_rune"])
                 global found_side_object 
                 found_side_object.append("new side")
                 sio.emit('open_map', len(found_side_object))
@@ -176,19 +176,18 @@ def check_rune(sid, data):
                     found_side_object = []
                     api_return = send_data_api(is_finished=True)
                     if api_return:
-                        end_game()
-                        sio.emit('finish_message', "finished")
+                        sio.emit('finish_message', "finish_message")
                         time.sleep(2) #wait for user to see the map 
                         sio.emit('finish_game')
 
             else:
-                sio.emit('update_rune', [game.count, new_rune_object, "right"]) #right so front makes tick sign
+                sio.emit('change_side', [game.count, new_rune_object, "right_rune"]) #right so front makes tick sign
     else:
         rune_timer_object.cancel()
         call_rune_time()
         print("they are not same")
         new_rune_object = get_new_rune()
-        sio.emit('change_side', [game.count, new_rune_object, "wrong"]) #right so front makes x sign
+        sio.emit('change_side', [game.count, new_rune_object, "wrong_rune"]) #right so front makes x sign
 
 
 
