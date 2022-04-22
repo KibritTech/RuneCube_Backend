@@ -48,12 +48,12 @@ def disconnect(sid):
                 timer_object.start() #call func here to start countdown, if time is zero then delete the game
                 print('STARTED TIMER OBJECT IN DISCONNECT')
                 print("User ", user, ' is disconnected')
-            # elif entered_users_count == 0 :
+            elif entered_users_count == 0 :
+                print('disconnected before game started', entered_users_count)
+                online_users.clear()
+                play_master.delete_players()
+                sio.emit('disconnect_before_start')
 
-            #     print('disconnected before game started', entered_users_count)
-            #     online_users.clear()
-            #     play_master.delete_players()
-            #     sio.emit('disconnect_before_start')
 
 
 
@@ -99,6 +99,7 @@ def read_story(sid):
     chosen_players = play_master.players
     global entered_users_count
     entered_users_count += 1
+    print(entered_users_count, 'entered users count in read story')
     if len(chosen_players) == 2 and entered_users_count == 2:
         print('BOTH USERS READ THE STORY, BOTH USERS READ THE STORY,BOTH USERS READ THE STORY')
         rune_object = game_master.create_game()
