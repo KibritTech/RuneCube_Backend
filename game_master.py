@@ -39,6 +39,7 @@ class PlayerMaster:
                 player = Player(player_username, player_role)
                 self.roles.append(player_role)
                 self.players.append(player)
+                print('wetryuiop[]poiuytrewertyuioplkjhgfxcvbnm', self.players)
                 if len(self.roles) == 2: 
                     players = self.players
                     story_api = requests.get("https://runecube.herokuapp.com/api/Storys")
@@ -66,11 +67,10 @@ class PlayerMaster:
 
 
 
-player_master = PlayerMaster()
+play_master = PlayerMaster()
 rune_master = RuneMaster()
 rune_api = []
 current_rune_id = [0]
-# length_rune_api = 0
 
 
 
@@ -91,15 +91,13 @@ class GameMaster:
         current_rune_id[0] = current_rune_object["id"]
         settings_api = requests.get("https://runecube.herokuapp.com/api/settings")
         settings = settings_api.json()
-        # global countdown_time
-        # countdown_time = settings["maxResponseTime"]
         game_id = 123  #random id to test get_game func
         if self.games == []:
             print('self games are empty')
             rune = rune_master.create_rune(id=current_rune_object["id"], value=current_rune_object["value"],color=current_rune_object["color"])
             game = Game(game_id=game_id, start_time=dt.now(), count=settings["count"], 
             max_response_time=settings["maxResponseTime"], each_side_count=settings["eachSideCount"], sides_time=settings["sidesTime"])
-            players = player_master.players
+            players = play_master.players
             game.add_player(players=players)
             self.games.append(game)
             rune_object = [current_rune_object, settings]

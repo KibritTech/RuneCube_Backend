@@ -2,7 +2,6 @@ from datetime import datetime as dt
 import random, socketio, requests
 import time
 from game_master import PlayerMaster, game_master, rune_master, current_rune_id
-# from game_master import length_rune_api as ls
 import game_master as gs #import it like this so can get rune_api
 from threading import Timer
 from reset_timer import TimerReset
@@ -39,15 +38,17 @@ def disconnect(sid):
     print(f"client with {sid} disconnected")
     print("online users in DISCONNECT ", online_users)
     print("GAME START STATE IN DISCONNECT", game_start_state)
-    for user in online_users:
-        if user["sid"] == sid:
-            user["online"] = False
-            if True in game_start_state:
-                global timer_object
-                timer_object = func_thread()
-                timer_object.start() #call func here to start countdown, if time is zero then delete the game
-                print('STARTED TIMER OBJECT IN DISCONNECT')
-                print("User ", user, ' is disconnected')
+    if online_users != []:
+        for user in online_users:
+            if user["sid"] == sid:
+                user["online"] = False
+                print('Made this user offline', user )
+                if True in game_start_state:
+                    global timer_object
+                    timer_object = func_thread()
+                    timer_object.start() #call func here to start countdown, if time is zero then delete the game
+                    print('STARTED TIMER OBJECT IN DISCONNECT')
+                    print("User ", user, ' is disconnected')
 
 
 @sio.event
@@ -63,7 +64,7 @@ def user_reconnected(sid, data):
             if (username == active_username and role == active_role)  and user["online"] == False:
                 new_sid = data["sid"]
                 user["sid"] = new_sid
-                print('After changing sid to new sid users', online_users)
+                print('After changing sid to new sid, users are', online_users)
                 user["online"] = True
                 if True in game_start_state:
                     print(timer_object, 'GLOBAL timer_object STARTED')
@@ -90,11 +91,10 @@ entered_users_count = 0
 @sio.event
 def read_story(sid):
     chosen_players = play_master.players
-    print(chosen_players, "GET PLAYERS IN START GAME")
     global entered_users_count
     entered_users_count += 1
     if len(chosen_players) == 2 and entered_users_count == 2:
-        print('read_story length is 2  ')
+        print('BOTH USERS READ THE STORY')
         rune_object = game_master.create_game()
         sio.emit('read_story', rune_object)
 
@@ -122,13 +122,19 @@ def game_started(sid):
 def call_rune_time():
     global rune_timer_object
     rune_timer_object = countdown_max_response_time()
-    rune_timer_object.start()
+    if rune_timer_object != None:
+        rune_timer_object.start()
+    else:
+        print('rune timer object was none')
 
 
 def call_side_time():
     global side_timer_object
     side_timer_object = countdown_side_time()
-    side_timer_object.start()
+    if side_timer_object != None:
+        side_timer_object.start()
+    else:
+        print('rune timer object was none')
 
 
 
@@ -160,23 +166,16 @@ def check_rune(sid, data):
                 sio.emit('change_side', [game.count, new_rune_object])
                 global found_side_object 
                 found_side_object.append("new side")
-                print(found_side_object, 'found side object after appending')
                 sio.emit('open_map', len(found_side_object))
                 print("OPENED MAP COUNT  ", len(found_side_object))
                 if game.each_side_count == len(found_side_object):
                     found_side_object = []
                     api_return = send_data_api(is_finished=True)
                     if api_return:
-                        global online_users
-                        online_users = []
-                        global game_start_state
-                        game_start_state = []
+                        end_game()
                         sio.emit('finish_message', "finished")
                         time.sleep(2) #wait for user to see the map 
                         sio.emit('finish_game')
-                        print("Game Finishedddddd")
-                        rune_timer_object.cancel()
-                        side_timer_object.cancel()
 
             else:
                 sio.emit('update_rune', [game.count, new_rune_object, "right"]) #right so front makes tick sign
@@ -212,16 +211,9 @@ def rune_time(sid):
 def timeout():
     api_return = send_data_api(is_finished=False)
     if api_return:
-        global found_side_object
-        found_side_object = []
-        global online_users
-        online_users = []
-        global game_start_state
-        game_start_state = []
-        sio.emit('finish_game', True)
-        rune_timer_object.cancel()
-        side_timer_object.cancel() 
-        print("Game Finishedddddd")
+        end_game()
+        show_disconnection_message = True
+        sio.emit('finish_game', show_disconnection_message)   
 
 
 threads = []
@@ -230,8 +222,6 @@ def func_thread():
     threads.append(timing)
     print(threads, "ALL THREADS AFTER DISCONNECT")
     return timing
-
-
 
 
 def rune_time_finish():
@@ -280,20 +270,33 @@ def send_data_api(is_finished):
         username1 = first_user.player_username
         username2 = second_user.player_username
         role1 = first_user.player_role
-        role2 = second_user.player_role
         subtract_time = game.finish_time - game.start_time
         spent_time = str(subtract_time).split(".")[0]                    
         payload = {'username1': username1, 'role1': role1, 'username2': username2, 'spent_time': spent_time, 
         'is_finished': is_finished}
         posted_game_data = requests.post(leaderboard_url, json=payload)
         if posted_game_data:
-            game.remove_players()
-            game_master.delete_game()
-            print(play_master.players, 'delete players object before clearing it')
-            play_master.delete_players()
-            print(play_master.players, 'delete players object after')
+            end_game()
             return True
         else:
             return False
     
+
+def end_game():
+    game = game_master.get_game()
+    if game != None:
+        global found_side_object
+        found_side_object = []
+        global online_users
+        online_users = []
+        global game_start_state
+        game_start_state = []
+        rune_timer_object.cancel()
+        side_timer_object.cancel() 
+        game.remove_players()
+        game_master.delete_game()
+        print(play_master.players, 'delete players object before clearing it')
+        play_master.delete_players()
+        print(play_master.players, 'delete players object after')
+        print('GAME FINISHEDDDDD')
 

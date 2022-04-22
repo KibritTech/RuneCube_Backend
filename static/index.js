@@ -9,7 +9,7 @@ sio.on('connect', () => {
 //     console.log(start_game, "asdfghjklwertyuio");
 // });
 
-// sio.emit('start_game', (game) => {
+// sio.emit('read_story', (game) => {
 //     console.log(game, 'qqqqqqqqqqq');
 // })
 });
@@ -30,9 +30,9 @@ sio.on('disconnect', () => {
 //     console.log(ready);
 // });
 
-sio.emit('check_rune', {"value": "Torus", "color": "Pink"}, (count) => {
-    console.log(count, 'cccccccccccccccc');
-});
+// sio.emit('check_rune', {"value": "Sphere", "color": "Pink"}, (count) => {
+//     console.log(count, 'cccccccccccccccc');
+// });
 
   // sio.emit('game_started', (count) => {
   //   console.log(count, 'game started');
