@@ -99,7 +99,7 @@ def read_story(sid):
     global entered_users_count
     entered_users_count += 1
     if len(chosen_players) == 2 and entered_users_count == 2:
-        print('BOTH USERS READ THE STORY')
+        print('BOTH USERS READ THE STORY, BOTH USERS READ THE STORY,BOTH USERS READ THE STORY')
         rune_object = game_master.create_game()
         sio.emit('read_story', rune_object)
 
