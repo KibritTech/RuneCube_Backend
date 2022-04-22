@@ -38,17 +38,21 @@ def disconnect(sid):
     print(f"client with {sid} disconnected")
     print("online users in DISCONNECT ", online_users)
     print("GAME START STATE IN DISCONNECT", game_start_state)
-    if online_users != []:
-        for user in online_users:
-            if user["sid"] == sid:
-                user["online"] = False
-                print('Made this user offline', user )
-                if True in game_start_state:
-                    global timer_object
-                    timer_object = func_thread()
-                    timer_object.start() #call func here to start countdown, if time is zero then delete the game
-                    print('STARTED TIMER OBJECT IN DISCONNECT')
-                    print("User ", user, ' is disconnected')
+    for user in online_users:
+        if user["sid"] == sid:
+            user["online"] = False
+            print('Made this user offline', user )
+            if True in game_start_state:
+                global timer_object
+                timer_object = func_thread()
+                timer_object.start() #call func here to start countdown, if time is zero then delete the game
+                print('STARTED TIMER OBJECT IN DISCONNECT')
+                print("User ", user, ' is disconnected')
+            else:
+                online_users.clear()
+                play_master.delete_players()
+                sio.emit('disconnect_before_start')
+
 
 
 @sio.event
@@ -211,7 +215,6 @@ def rune_time(sid):
 def timeout():
     api_return = send_data_api(is_finished=False)
     if api_return:
-        end_game()
         show_disconnection_message = True
         sio.emit('finish_game', show_disconnection_message)   
 
